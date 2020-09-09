@@ -50,6 +50,7 @@ public class Webrtc extends Activity implements DJICodecManager.YuvDataCallback 
     private VideoFeeder.VideoFeed standardVideoFeeder;
 //내가 수정한것입니다.
 //test
+    //assandansda
     protected VideoFeeder.VideoDataListener mReceivedVideoDataListener = null;
     private TextView titleTv;
     public Handler mainHandler = new Handler(Looper.getMainLooper()) {

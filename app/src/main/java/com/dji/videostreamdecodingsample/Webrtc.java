@@ -48,12 +48,12 @@ public class Webrtc extends Activity implements DJICodecManager.YuvDataCallback 
     private enum DemoType { USE_TEXTURE_VIEW, USE_SURFACE_VIEW, USE_SURFACE_VIEW_DEMO_DECODER}
     private static DemoType demoType = DemoType.USE_SURFACE_VIEW;
     private VideoFeeder.VideoFeed standardVideoFeeder;
-
+//내가 수정한것입니다.
 //test
     protected VideoFeeder.VideoDataListener mReceivedVideoDataListener = null;
     private TextView titleTv;
     public Handler mainHandler = new Handler(Looper.getMainLooper()) {
-        //수ㄹㅇㄹㅇㄴㄹㅇㄴㄹㅇㄴㄹㅇㄴㄹ
+        //수ㄹㅇㄹㅇㄴㄹㅇㄴㅇㄴㄹㅇㄴㄹ
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {

@@ -52,7 +52,8 @@ public class Webrtc extends Activity implements DJICodecManager.YuvDataCallback 
 
     protected VideoFeeder.VideoDataListener mReceivedVideoDataListener = null;
     private TextView titleTv;
-    public Handler mainHandler = new Handler(Looper.getMainLooper()) {
+    public Handler mainHandler = new Handler(Looper.getMainLooper()) {정
+        //수
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {

@@ -49,7 +49,7 @@ public class Webrtc extends Activity implements DJICodecManager.YuvDataCallback 
     private static DemoType demoType = DemoType.USE_SURFACE_VIEW;
     private VideoFeeder.VideoFeed standardVideoFeeder;
 
-
+//test
     protected VideoFeeder.VideoDataListener mReceivedVideoDataListener = null;
     private TextView titleTv;
     public Handler mainHandler = new Handler(Looper.getMainLooper()) {

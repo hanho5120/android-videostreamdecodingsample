@@ -5,11 +5,12 @@
     android:paddingEnd="60dp"
     android:paddingStart="60dp"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/dronetitle">
 
     <TableRow
-        android:paddingTop="40dp"
-        android:layout_weight="1"
+        android:paddingTop="0dp"
+        android:layout_weight="0"
         android:layout_width="match_parent"
         android:layout_height="0dp"/>
 
@@ -42,7 +43,7 @@
         android:text="Map Widget Demo"/>
 
     <TableRow
-        android:layout_weight="1"
+        android:layout_weight="0"
         android:layout_width="match_parent"
         android:layout_height="0dp"/>
 
@@ -72,5 +73,7 @@
         android:textColor="@color/white"
         android:gravity="center"
         tools:text="Version"/>
+
+
 
 </TableLayout>

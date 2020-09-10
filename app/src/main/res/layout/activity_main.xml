@@ -8,6 +8,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/dronetitle">
 
+
     <TableRow
         android:paddingTop="0dp"
         android:layout_weight="0"

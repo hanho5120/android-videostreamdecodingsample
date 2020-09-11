@@ -74,6 +74,15 @@
         android:gravity="center"
         tools:text="Version"/>
 
-
+    <TextView
+        android:id="@+id/state"
+        android:layout_width="match_parent"
+        android:layout_height="95dp"
+        android:layout_margin="10dp"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:text="처음 초기값"
+        />
 
 </TableLayout>

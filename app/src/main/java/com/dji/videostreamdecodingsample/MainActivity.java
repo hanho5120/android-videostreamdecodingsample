@@ -9,6 +9,9 @@ import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -49,6 +52,15 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
     private static final String LAST_USED_BRIDGE_IP = "bridgeip";
     private AtomicBoolean isRegistrationInProgress = new AtomicBoolean(false);
     private static boolean isAppStarted = false;
+
+
+
+    TextView stateText;
+    Handler mHandler = null;
+    Thread mThread = null;
+
+    public static final int SEND_TIME = 0;
+
     private DJISDKManager.SDKManagerCallback registrationCallback = new DJISDKManager.SDKManagerCallback() {
 
         @Override
@@ -66,6 +78,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                         Toast.LENGTH_LONG).show();
             }
         }
+
         @Override
         public void onProductDisconnect() {
             Toast.makeText(getApplicationContext(),
@@ -106,7 +119,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
         }
     };
 
-    private void loginAccount(){
+    private void loginAccount() {
         UserAccountManager.getInstance().logIntoDJIUserAccount(this,
                 new CommonCallbacks.CompletionCallbackWith<UserAccountState>() {
                     @Override
@@ -115,6 +128,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                                 "Login Success!",
                                 Toast.LENGTH_LONG).show();
                     }
+
                     @Override
                     public void onFailure(DJIError error) {
                         Toast.makeText(getApplicationContext(),
@@ -128,7 +142,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
     public static boolean isStarted() {
         return isAppStarted;
     }
-    private static final String[] REQUIRED_PERMISSION_LIST = new String[] {
+
+    private static final String[] REQUIRED_PERMISSION_LIST = new String[]{
             Manifest.permission.VIBRATE, // Gimbal rotation
             Manifest.permission.INTERNET, // API requests
             Manifest.permission.ACCESS_WIFI_STATE, // WIFI connected products
@@ -148,6 +163,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
     private List<String> missingPermission = new ArrayList<>();
     private EditText bridgeModeEditText;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -156,8 +172,19 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
         findViewById(R.id.complete_ui_widgets).setOnClickListener(this);
         findViewById(R.id.bt_customized_ui_widgets).setOnClickListener(this);
         findViewById(R.id.bt_map_widget).setOnClickListener(this);
+
         TextView versionText = (TextView) findViewById(R.id.version);
         versionText.setText(getResources().getString(R.string.sdk_version, DJISDKManager.getInstance().getSDKVersion()));
+
+
+
+        stateText = (TextView)findViewById(R.id.state);
+
+        Thread mThread = new mThread();
+        mThread.setDaemon(true);
+        mThread.start();
+        mHandler = new Handler();
+
         bridgeModeEditText = (EditText) findViewById(R.id.edittext_bridge_ip);
         bridgeModeEditText.setText(PreferenceManager.getDefaultSharedPreferences(this).getString(LAST_USED_BRIDGE_IP,""));
         bridgeModeEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -200,6 +227,48 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
             }
         });
         checkAndRequestPermissions();
+    }
+
+    Handler handler = new Handler() {
+
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case SEND_TIME:
+                    stateText.setText(Integer.toString(msg.arg1) + msg.obj);
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
+
+    class mThread extends Thread {
+        int i = 0;
+        @Override
+        public void run() {
+            super.run();
+            while (true) {
+                i++; // 메시지 얻어오기
+                Message message = handler.obtainMessage();
+                // 메시지 ID 설정
+                message.what = SEND_TIME;
+                // 메시지 내용 설정 (int)
+                message.arg1 = i;
+                // 메시지 내용 설정 (Object)
+                String information = new String("초 째 Thread 동작 중입니다.");
+                message.obj = information;
+                // 메시지 전
+                stateText.setText(Integer.toString(message.arg1) + message.obj);
+                handler.sendMessage(message);
+                try {
+                    // 1초 씩 딜레이 부여
+                    sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     @Override

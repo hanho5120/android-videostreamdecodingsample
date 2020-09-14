@@ -20,6 +20,7 @@ import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -27,6 +28,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.internal.Objects;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,12 +56,20 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
     private static boolean isAppStarted = false;
 
 
-
+    //추가한 변수 리스트
     TextView stateText;
     Handler mHandler = null;
     Thread mThread = null;
+    Button btn_map_widget;
 
-    public static final int SEND_TIME = 0;
+
+    //값 체크 부분 리스트
+    public static boolean bool_onRegister = false;
+
+    public static StringBuilder LOG = new StringBuilder();
+
+    public static final int SEND_LOG = 0;
+    public static final int SEND_VIS = 1;
 
     private DJISDKManager.SDKManagerCallback registrationCallback = new DJISDKManager.SDKManagerCallback() {
 
@@ -71,11 +81,16 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                 DJISDKManager.getInstance().startConnectionToProduct();
 
                 Toast.makeText(getApplicationContext(), "SDK registration succeeded!", Toast.LENGTH_LONG).show();
+                bool_onRegister = true;
+                LOG.append("SDK 등록 성공"+"\n");
+                //bt_map_widget.setVisibility(View.VISIBLE);
             } else {
-
                 Toast.makeText(getApplicationContext(),
                         "SDK registration failed, check network and retry!",
                         Toast.LENGTH_LONG).show();
+                bool_onRegister = false;
+                LOG.append("SDK 등록 실패"+"\n");
+
             }
         }
 
@@ -84,6 +99,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
             Toast.makeText(getApplicationContext(),
                     "product disconnect!",
                     Toast.LENGTH_LONG).show();
+            LOG.append("제품 연결 안 됨"+"\n");
         }
 
         @Override
@@ -91,6 +107,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
             Toast.makeText(getApplicationContext(),
                     "product connect!",
                     Toast.LENGTH_LONG).show();
+            LOG.append("제품 연결 됨"+"\n");
         }
 
         @Override
@@ -105,7 +122,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
             Toast.makeText(getApplicationContext(),
                     key.toString() + " changed",
                     Toast.LENGTH_LONG).show();
-
+            LOG.append("컴포넌트 변경 됨"+"\n");
         }
 
         @Override
@@ -127,6 +144,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                         Toast.makeText(getApplicationContext(),
                                 "Login Success!",
                                 Toast.LENGTH_LONG).show();
+                        LOG.append("로그인 성공"+"\n");
                     }
 
                     @Override
@@ -134,6 +152,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                         Toast.makeText(getApplicationContext(),
                                 "Login Error!",
                                 Toast.LENGTH_LONG).show();
+                        LOG.append("로그인 에러"+"\n");
                     }
                 });
 
@@ -171,12 +190,14 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
         isAppStarted = true;
         findViewById(R.id.complete_ui_widgets).setOnClickListener(this);
         findViewById(R.id.bt_customized_ui_widgets).setOnClickListener(this);
-        findViewById(R.id.bt_map_widget).setOnClickListener(this);
+
+        //추가 부분
+        btn_map_widget = (Button) findViewById(R.id.btn_map_widget);
+        findViewById(R.id.btn_map_widget).setOnClickListener(this);
+
 
         TextView versionText = (TextView) findViewById(R.id.version);
         versionText.setText(getResources().getString(R.string.sdk_version, DJISDKManager.getInstance().getSDKVersion()));
-
-
 
         stateText = (TextView)findViewById(R.id.state);
 
@@ -184,6 +205,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
         mThread.setDaemon(true);
         mThread.start();
         mHandler = new Handler();
+        //------------------------------
 
         bridgeModeEditText = (EditText) findViewById(R.id.edittext_bridge_ip);
         bridgeModeEditText.setText(PreferenceManager.getDefaultSharedPreferences(this).getString(LAST_USED_BRIDGE_IP,""));
@@ -234,14 +256,28 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case SEND_TIME:
-                    stateText.setText(Integer.toString(msg.arg1) + msg.obj);
+                case SEND_LOG:
+                    //stateText.setText(Integer.toString(msg.arg1) + msg.obj+"\n");
+                    //stateText.setText((Integer) msg.obj);
+                    stateText.setText(msg.obj.toString());
                     break;
+                case SEND_VIS:
+                    if(bool_onRegister) {
+                        //btn_map_widget.setVisibility(View.VISIBLE);
+                        btn_map_widget.setVisibility(View.VISIBLE);
+                    }
+                    else{
+                        btn_map_widget.setVisibility(View.INVISIBLE);
+                    }
+                    break;
+
                 default:
                     break;
             }
         }
+
     };
+
 
     class mThread extends Thread {
         int i = 0;
@@ -249,18 +285,45 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
         public void run() {
             super.run();
             while (true) {
-                i++; // 메시지 얻어오기
+                //조건 추가해서 덜 돌게하기
+                //버튼 보이게 하기
+                Message message_vis = handler.obtainMessage();
+                message_vis.what = SEND_VIS;
+                handler.sendMessage(message_vis);
+
+
+                //StringBuilder logmsg = new StringBuilder();
+
+                //로그 메세지
+                Message message_log = handler.obtainMessage();
+                message_log.what = SEND_LOG;
+                //if로 조건하면서 한번에 ~~~~
+                //누적 settext
+                /*if(bool_onRegister) {
+                    logmsg.append("SDK 등록 성공" + "\n");
+                }
+                else {
+                    logmsg.append("SDK 등록 실패, 네트워크 확인 후 재시도 요망" + "\n");
+                }*/
+
+
+                message_log.obj = LOG;
+                handler.sendMessage(message_log);
+
+                /*i++;
                 Message message = handler.obtainMessage();
-                // 메시지 ID 설정
                 message.what = SEND_TIME;
                 // 메시지 내용 설정 (int)
+                //String ifRegi = new String(String.valueOf(bool_onRegister));
+                //message.obj = ifRegi;
                 message.arg1 = i;
                 // 메시지 내용 설정 (Object)
                 String information = new String("초 째 Thread 동작 중입니다.");
                 message.obj = information;
-                // 메시지 전
-                stateText.setText(Integer.toString(message.arg1) + message.obj);
+
                 handler.sendMessage(message);
+                */
+
                 try {
                     // 1초 씩 딜레이 부여
                     sleep(1000);
@@ -268,6 +331,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                     e.printStackTrace();
                 }
             }
+
         }
     }
 

@@ -113,7 +113,6 @@
         android:layout_marginLeft="-141dp"
         android:layout_marginTop="0dp"
         android:layout_marginRight="2dp"
-
         android:background="@color/title_dark"
         android:gravity="bottom"
         android:padding="5dp"

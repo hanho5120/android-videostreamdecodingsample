@@ -73,12 +73,16 @@
     <TextView
         android:id="@+id/state"
         android:layout_width="match_parent"
-        android:layout_height="180dp"
+        android:layout_height="206dp"
         android:layout_margin="10dp"
-        android:gravity="center"
+        android:gravity=""
         android:text="처음 초기값"
         android:textColor="@color/white"
         android:textSize="14sp" />
+
+    <EditText>
+        <!-- edit text 2개 추가하기-->
+    </EditText>
 
     <Button
         android:id="@+id/btn_map_widget"
@@ -90,5 +94,6 @@
         android:textColor="@color/background_blue"
         android:textSize="14sp"
         android:visibility="visible" />
+
 
 </TableLayout>

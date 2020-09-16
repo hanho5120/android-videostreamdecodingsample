@@ -118,7 +118,52 @@
         android:padding="5dp"
         android:scrollbars="vertical"
         android:textColor="@color/colorWhite"
-        android:visibility="invisible"/>
+        android:visibility="invisible"
+
+        />
+
+    <LinearLayout
+        android:id="@+id/TakeOffReturnPanel"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/dashboard_widget"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="12dp"
+        android:layout_marginBottom="80dp"
+        android:gravity="right"
+        android:orientation="vertical">
+
+        <dji.ux.widget.TakeOffWidget
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginBottom="5dp" />
+
+        <dji.ux.widget.ReturnHomeWidget
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp" />
+    </LinearLayout>
+
+
+
+    <LinearLayout
+        android:id="@+id/dashboard_widget"
+        android:layout_width="427dp"
+        android:layout_height="103dp"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <dji.ux.widget.dashboard.DashboardWidget
+            android:id="@+id/Compass"
+            android:layout_width="405dp"
+            android:layout_height="91dp"
+            android:layout_marginRight="12dp"
+            android:visibility="visible"
+            tools:ignore="RtlHardcoded" />
+
+    </LinearLayout>
     <!--
     android:layout_toRightOf="@id/activity_main_screen_shot"
 얘는 왜 오류지?

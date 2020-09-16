@@ -82,15 +82,16 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
 
                 Toast.makeText(getApplicationContext(), "SDK registration succeeded!", Toast.LENGTH_LONG).show();
                 bool_onRegister = true;
-                LOG.append("SDK 등록 성공"+"\n");
+                //LOG.append("SDK 등록 성공"+"\n");
+                LOG.append("SDK 등록 성공, ");
                 //bt_map_widget.setVisibility(View.VISIBLE);
             } else {
                 Toast.makeText(getApplicationContext(),
                         "SDK registration failed, check network and retry!",
                         Toast.LENGTH_LONG).show();
                 bool_onRegister = false;
-                LOG.append("SDK 등록 실패"+"\n");
-
+                //LOG.append("SDK 등록 실패"+"\n");
+                LOG.append("SDK 등록 실패, ");
             }
         }
 
@@ -99,7 +100,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
             Toast.makeText(getApplicationContext(),
                     "product disconnect!",
                     Toast.LENGTH_LONG).show();
-            LOG.append("제품 연결 안 됨"+"\n");
+            //LOG.append("제품 연결 안 됨"+"\n");
+            LOG.append("제품 연결 안 됨, ");
         }
 
         @Override
@@ -107,6 +109,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
             Toast.makeText(getApplicationContext(),
                     "product connect!",
                     Toast.LENGTH_LONG).show();
+            //LOG.append("제품 연결 됨"+"\n");
             LOG.append("제품 연결 됨"+"\n");
         }
 
@@ -122,7 +125,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
             Toast.makeText(getApplicationContext(),
                     key.toString() + " changed",
                     Toast.LENGTH_LONG).show();
-            LOG.append("컴포넌트 변경 됨"+"\n");
+            //LOG.append("컴포넌트 변경 됨"+"\n");
+            LOG.append("컴포넌트 변경 됨, ");
         }
 
         @Override
@@ -144,7 +148,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                         Toast.makeText(getApplicationContext(),
                                 "Login Success!",
                                 Toast.LENGTH_LONG).show();
-                        LOG.append("로그인 성공"+"\n");
+                        //LOG.append("로그인 성공"+"\n");
+                        LOG.append("로그인 성공, ");
                     }
 
                     @Override
@@ -152,7 +157,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                         Toast.makeText(getApplicationContext(),
                                 "Login Error!",
                                 Toast.LENGTH_LONG).show();
-                        LOG.append("로그인 에러"+"\n");
+                        //LOG.append("로그인 에러"+"\n");
+                        LOG.append("로그인 에러, ");
                     }
                 });
 

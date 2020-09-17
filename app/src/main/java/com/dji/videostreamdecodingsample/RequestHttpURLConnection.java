@@ -1,3 +1,5 @@
+package com.dji.videostreamdecodingsample;
+
 import android.content.ContentValues;
 import java.io.BufferedReader;
 import java.io.IOException;

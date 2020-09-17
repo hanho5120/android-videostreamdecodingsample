@@ -101,7 +101,7 @@ public class CompleteWidgetActivity extends Activity {
 
         parentView = (ViewGroup) findViewById(R.id.root_view);
 
-        fpvWidget = findViewById(R.id.fpv_widget);
+        fpvWidget = (FPVWidget) findViewById(R.id.fpv_widget);
         fpvWidget.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

@@ -18,8 +18,6 @@ public class MApplication extends Application {
         return mProduct;
     }
 
-
-
     @Override
     protected void attachBaseContext(Context paramContext) {
         super.attachBaseContext(paramContext);

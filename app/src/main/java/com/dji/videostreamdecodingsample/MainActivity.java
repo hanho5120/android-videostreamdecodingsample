@@ -14,6 +14,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.text.Editable;
+import android.text.Layout;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
@@ -61,6 +62,10 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
     Handler mHandler = null;
     Thread mThread = null;
     Button btn_map_widget;
+    TextView edit_idText;
+    TextView edit_pwText;
+    View view_userInfo;
+    Button btn_exit;
 
 
     //값 체크 부분 리스트
@@ -197,9 +202,23 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
         findViewById(R.id.complete_ui_widgets).setOnClickListener(this);
         findViewById(R.id.bt_customized_ui_widgets).setOnClickListener(this);
 
-        //추가 부분
+        //추가 부분--------------
         btn_map_widget = (Button) findViewById(R.id.btn_map_widget);
         findViewById(R.id.btn_map_widget).setOnClickListener(this);
+
+        //로그인정보
+        view_userInfo = (View) findViewById(R.id.view_userInfo);
+        edit_idText = (TextView) findViewById(R.id.edit_idText);
+        edit_pwText = (TextView) findViewById(R.id.edit_pwText);
+        btn_exit = (Button) findViewById(R.id.btn_exit);
+        btn_exit.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                //view_userInfo.setVisibility(View.INVISIBLE);
+                bool_onRegister = false;
+            }
+        });
 
 
         TextView versionText = (TextView) findViewById(R.id.version);
@@ -270,10 +289,11 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                 case SEND_VIS:
                     if(bool_onRegister) {
                         //btn_map_widget.setVisibility(View.VISIBLE);
-                        btn_map_widget.setVisibility(View.VISIBLE);
+                        view_userInfo.setVisibility(View.VISIBLE);
                     }
                     else{
-                        btn_map_widget.setVisibility(View.INVISIBLE);
+                        view_userInfo.setVisibility(View.INVISIBLE);
+                        //btn_map_widget.setVisibility(View.INVISIBLE);
                     }
                     break;
 

@@ -1,99 +1,260 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:paddingEnd="60dp"
     android:paddingStart="60dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/dronetitle">
+    android:background="@drawable/dronetitle"
+    android:orientation="vertical">
 
-    <TableRow
-        android:paddingTop="0dp"
-        android:layout_weight="0"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"/>
+    <!-- 윗부분-->
+    <RelativeLayout
+        android:layout_width="510dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="50dp"
+        android:layout_centerHorizontal="true"
+        android:orientation="vertical">
 
-    <Button
-        android:id="@+id/complete_ui_widgets"
-        android:layout_width="match_parent"
-        android:layout_height="0sp"
-        android:textSize="14sp"
-        android:layout_margin="0dp"
-        android:padding="0dp"
-        android:textColor="@color/background_blue"
-        android:text="Complete Demo of Default UI Widgets"
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_weight="0"
+            android:paddingTop="0dp"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/complete_ui_widgets"
+            android:layout_width="match_parent"
+            android:layout_height="1sp"
+            android:layout_margin="0dp"
+            android:padding="0dp"
+            android:text="Complete Demo of Default UI Widgets"
+            android:textColor="@color/background_blue"
+            android:textSize="14sp"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/bt_customized_ui_widgets"
+            android:layout_width="match_parent"
+            android:layout_height="0sp"
+            android:layout_margin="0dp"
+            android:padding="0dp"
+            android:text="Demo on Customized UI Widgets"
+            android:textColor="@color/background_blue"
+            android:textSize="14sp"
+            android:visibility="gone" />
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/version"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="10dp"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:visibility="gone"
+            tools:text="Version" />
+
+        <EditText
+            android:id="@+id/edittext_bridge_ip"
+            android:layout_width="wrap_content"
+            android:layout_height="40sp"
+            android:layout_margin="10dp"
+            android:background="@color/gray"
+            android:digits="0123456789.\n"
+            android:gravity="center"
+            android:hint="@string/wsbridge_ip"
+            android:imeOptions="actionDone"
+            android:maxLength="15"
+            android:maxLines="1"
+            android:padding="2dp"
+            android:textColor="@color/white"
+            android:textColorHint="@android:color/white"
+            android:textSize="15sp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/state"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:text="처음 초기값"
+            android:textColor="@color/white"
+            android:textSize="14sp" />
+        >
+
+    </RelativeLayout>
+
+    <!-- 아래부분-->
+    <RelativeLayout
+        android:id="@+id/view_userInfo"
+        android:layout_width="572dp"
+        android:layout_height="361dp"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="10dp"
+        android:background="#232228"
         android:visibility="invisible"
-        />
-    <Button
-        android:id="@+id/bt_customized_ui_widgets"
-        android:layout_width="match_parent"
-        android:layout_height="0sp"
-        android:textSize="14sp"
-        android:layout_margin="0dp"
-        android:padding="0dp"
-        android:textColor="@color/background_blue"
-        android:text="Demo on Customized UI Widgets"
-        android:visibility="invisible"/>
+        >
 
-    <TableRow
-        android:layout_weight="0"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"/>
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/ic_drone"
+            android:backgroundTint="@color/white">
 
-    <EditText
-        android:id="@+id/edittext_bridge_ip"
-        android:layout_width="wrap_content"
-        android:layout_height="0sp"
-        android:layout_margin="10dp"
-        android:background="@color/gray"
-        android:digits="0123456789.\n"
-        android:gravity="center"
-        android:hint="@string/wsbridge_ip"
-        android:imeOptions="actionDone"
-        android:maxLength="15"
-        android:maxLines="1"
-        android:padding="2dp"
-        android:textColor="@color/white"
-        android:textColorHint="@android:color/white"
-        android:textSize="15sp"
-        android:visibility="invisible" />
+        </ImageView>
 
-    <TextView
-        android:id="@+id/version"
-        android:layout_width="match_parent"
-        android:layout_height="0sp"
-        android:layout_margin="10dp"
-        android:gravity="center"
-        android:textColor="@color/white"
-        android:textSize="14sp"
-        android:visibility="invisible"
-        tools:text="Version" />
+        <Button
+            android:id="@+id/btn_exit"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/leftmenu_dlg_cancel"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
+            />
 
-    <TextView
-        android:id="@+id/state"
-        android:layout_width="match_parent"
-        android:layout_height="206dp"
-        android:layout_margin="10dp"
-        android:gravity=""
-        android:text="처음 초기값"
-        android:textColor="@color/white"
-        android:textSize="14sp" />
+        <EditText
+            android:id="@+id/edit_idText"
+            android:layout_width="240dp"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="160dp"
+            android:background="#19181D"
+            android:drawableStart="@drawable/ic_baseline_person_24"
+            android:gravity="center"
+            android:hint="드론의 아이디를 입력하세요."
+            android:maxLength="15"
+            android:maxLines="1"
+            android:padding="5dp"
+            android:textColor="@color/white"
+            android:textColorHint="@android:color/white"
+            android:textSize="15sp"
+            android:visibility="visible" />
 
-    <EditText>
-        <!-- edit text 2개 추가하기-->
-    </EditText>
+        <EditText
+            android:id="@+id/edit_pwText"
+            android:layout_width="240dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/edit_idText"
+            android:layout_centerInParent="true"
+            android:layout_marginVertical="20dp"
+            android:layout_marginTop="10dp"
+            android:background="#19181D"
+            android:drawableStart="@drawable/ic_baseline_https_24"
+            android:gravity="center"
+            android:hint="   드론의 비밀번호를 입력하세요."
+            android:inputType="textPassword"
+            android:maxLength="15"
+            android:maxLines="1"
+            android:padding="5dp"
+            android:textColor="@color/white"
+            android:textColorHint="@android:color/white"
+            android:textSize="15sp"
+            android:visibility="visible" />
 
-    <Button
-        android:id="@+id/btn_map_widget"
-        android:layout_width="398dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:padding="14dp"
-        android:text="Map Widget Demo"
-        android:textColor="@color/background_blue"
-        android:textSize="14sp"
-        android:visibility="visible" />
+        <Button
+            android:id="@+id/btn_map_widget"
+            android:layout_width="115dp"
+            android:layout_height="28dp"
+            android:layout_below="@+id/edit_pwText"
+            android:layout_centerInParent="true"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/roundbtn"
+            android:text="LOG IN"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:visibility="visible" />
+
+    </RelativeLayout>
 
 
-</TableLayout>
+    <!--
+        <com.google.android.material.textfield.TextInputLayout
+
+            android:layout_width="396dp"
+            android:layout_height="125dp"
+            android:layout_below="@id/state"
+            android:layout_marginTop="20dp"
+            android:layout_centerInParent="true"
+
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="378dp"
+                android:layout_height="105dp"
+
+                ></com.google.android.material.textfield.TextInputEditText>
+
+
+        </com.google.android.material.textfield.TextInputLayout>
+    -->
+    <!--
+            <RelativeLayout
+                android:id="@+id/loginui"
+                android:layout_width="268dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/state"
+                android:layout_centerVertical="true"
+                android:layout_marginTop="20dp"
+                android:orientation="horizontal"
+                android:layout_centerInParent="true"
+                android:padding="10sp">
+
+
+                <EditText
+                    android:id="@+id/userid"
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_gravity="center"
+                    android:background="@color/gray"
+                    android:gravity="center"
+                    android:hint="아이디를 입력하세요"
+                    android:maxLength="15"
+                    android:maxLines="1"
+                    android:padding="2dp"
+                    android:textColor="@color/white"
+                    android:textColorHint="@android:color/white"
+                    android:textSize="15sp"
+                    android:visibility="visible" />
+
+                <EditText
+                    android:id="@+id/userpw"
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/userid"
+                    android:layout_centerHorizontal="true"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="20dp"
+                    android:background="@color/gray"
+                    android:gravity="center"
+                    android:hint="비밀번호를 입력하세요"
+                    android:maxLength="15"
+                    android:maxLines="1"
+                    android:padding="2dp"
+                    android:textColor="@color/white"
+                    android:textColorHint="@android:color/white"
+                    android:textSize="15sp"
+                    android:visibility="visible" />
+
+
+            </RelativeLayout>
+-->
+</RelativeLayout>

@@ -67,7 +67,6 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
     View view_userInfo;
     Button btn_exit;
 
-
     //값 체크 부분 리스트
     public static boolean bool_onRegister = false;
 
@@ -75,6 +74,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
 
     public static final int SEND_LOG = 0;
     public static final int SEND_VIS = 1;
+
+
+
 
     private DJISDKManager.SDKManagerCallback registrationCallback = new DJISDKManager.SDKManagerCallback() {
 
@@ -197,14 +199,13 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main);  //화면 매칭 -> xml이랑 연결
         isAppStarted = true;
         findViewById(R.id.complete_ui_widgets).setOnClickListener(this);
         findViewById(R.id.bt_customized_ui_widgets).setOnClickListener(this);
 
         //추가 부분--------------
         btn_map_widget = (Button) findViewById(R.id.btn_map_widget);
-        findViewById(R.id.btn_map_widget).setOnClickListener(this);
 
         //로그인정보
         view_userInfo = (View) findViewById(R.id.view_userInfo);
@@ -219,6 +220,31 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                 bool_onRegister = false;
             }
         });
+        findViewById(R.id.btn_map_widget).setOnClickListener(this);
+        btn_map_widget.setOnClickListener(new View.OnClickListener(){
+        //보내는것
+            @Override
+            public void onClick(View v) {
+                /*
+                String droneid = edit_idText.getText().toString();
+                String dronepw = edit_pwText.getText().toString();
+
+
+                intent.putExtra("droneid",droneid);
+                intent.putExtra("dronepw",dronepw);
+
+*/
+                Userdata.getInstance()._id=edit_idText.getText().toString();
+
+                Userdata.getInstance()._pw=edit_pwText.getText().toString();
+
+                Intent intent = new Intent(MainActivity.this, Webrtc1.class);
+                startActivity(intent);
+            }
+        });
+
+
+
 
 
         TextView versionText = (TextView) findViewById(R.id.version);

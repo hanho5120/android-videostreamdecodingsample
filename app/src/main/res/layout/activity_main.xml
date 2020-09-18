@@ -16,7 +16,8 @@
         android:layout_gravity="center"
         android:layout_marginTop="50dp"
         android:layout_centerHorizontal="true"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="gone">
 
 
         <TableRow
@@ -96,47 +97,38 @@
 
     </RelativeLayout>
 
+
     <!-- 아래부분-->
     <RelativeLayout
         android:id="@+id/view_userInfo"
-        android:layout_width="572dp"
-        android:layout_height="361dp"
+        android:layout_width="400dp"
+        android:layout_height="250dp"
         android:layout_centerInParent="true"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="-50dp"
         android:background="#232228"
-        android:visibility="invisible"
-        >
+        android:layout_below="@+id/view_droneimg"
+        android:visibility="visible">
 
-        <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="30dp"
-            android:background="@drawable/ic_drone"
-            android:backgroundTint="@color/white">
-
-        </ImageView>
 
         <Button
             android:id="@+id/btn_exit"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:background="@drawable/leftmenu_dlg_cancel"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="10dp"
             android:layout_marginTop="10dp"
-            />
+            android:layout_marginRight="10dp"
+            android:background="@drawable/leftmenu_dlg_cancel" />
 
         <EditText
             android:id="@+id/edit_idText"
             android:layout_width="240dp"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="160dp"
+            android:layout_marginTop="70dp"
             android:background="#19181D"
             android:drawableStart="@drawable/ic_baseline_person_24"
             android:gravity="center"
-            android:hint="드론의 아이디를 입력하세요."
+            android:hint="  드론의  아이디를  입력하세요."
             android:maxLength="15"
             android:maxLines="1"
             android:padding="5dp"
@@ -183,6 +175,34 @@
             android:visibility="visible" />
 
     </RelativeLayout>
+
+    <!--드론 이미지-->
+    <RelativeLayout
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:id="@+id/view_droneimg"
+        android:layout_marginTop="20dp"
+        android:visibility="visible"
+        android:layout_centerHorizontal="true"
+        android:background="#00000000">
+
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerInParent="true"
+            android:background="@drawable/circle"/>
+
+        <ImageView
+            android:layout_width="78dp"
+            android:layout_height="78dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerInParent="true"
+            android:background="@drawable/ic_drone"
+            android:backgroundTint="@color/white"/>
+    </RelativeLayout>
+
+
 
 
     <!--

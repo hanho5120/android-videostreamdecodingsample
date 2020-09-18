@@ -2,6 +2,7 @@ package com.dji.videostreamdecodingsample;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -111,7 +112,8 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
     private static DemoType demoType = DemoType.USE_SURFACE_VIEW;
     private VideoFeeder.VideoFeed standardVideoFeeder;
 
-
+    TextView TextView_getid;
+    TextView TextView_getpw;
     protected VideoFeeder.VideoDataListener mReceivedVideoDataListener = null;
     private TextView titleTv;
     public Handler mainHandler = new Handler(Looper.getMainLooper()) {
@@ -771,6 +773,18 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
         setContentView(R.layout.activity_webrtc1);
         initUi();
 
+        TextView_getid = findViewById(R.id.TextView_getid);
+        TextView_getpw = findViewById(R.id.TextView_getpw);
+
+        //Intent intent = getIntent();
+        //Bundle bundle = intent.getExtras();
+        //String getdroneid = bundle.getString("droneid");
+        //String getdronepw = bundle.getString("dronepw");
+
+        //TextView_getid.setText(getdroneid);
+        //TextView_getpw.setText(getdronepw);
+        TextView_getid.setText(Userdata.getInstance()._id);
+        TextView_getpw.setText(Userdata.getInstance()._pw);
 
     }
 

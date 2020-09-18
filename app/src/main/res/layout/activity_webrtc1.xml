@@ -123,6 +123,27 @@
         />
 
     <LinearLayout
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/TextView_getid"
+            android:text="받아온 id"
+            android:textSize="20sp"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/TextView_getpw"
+            android:text="받아온 pw"
+            android:textSize="20sp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/TakeOffReturnPanel"
         android:layout_width="40dp"
         android:layout_height="wrap_content"

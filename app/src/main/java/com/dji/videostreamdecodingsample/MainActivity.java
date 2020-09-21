@@ -3,6 +3,7 @@ package com.dji.videostreamdecodingsample;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -65,6 +66,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
     TextView edit_idText;
     TextView edit_pwText;
     View view_userInfo;
+    View view_droneimg;
+    View view_background;
     Button btn_exit;
 
     //값 체크 부분 리스트
@@ -209,6 +212,15 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
 
         //로그인정보
         view_userInfo = (View) findViewById(R.id.view_userInfo);
+        view_droneimg = (View) findViewById(R.id.view_droneimg);
+        view_background = (View) findViewById(R.id.view_background);
+        view_background.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                bool_onRegister=true;
+            }
+        });
         edit_idText = (TextView) findViewById(R.id.edit_idText);
         edit_pwText = (TextView) findViewById(R.id.edit_pwText);
         btn_exit = (Button) findViewById(R.id.btn_exit);
@@ -302,6 +314,26 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
         checkAndRequestPermissions();
     }
 
+
+    public class  NetworkTask extends AsyncTask<Void, Void, String>{
+
+        private String url;
+        private ContentValues values;
+
+        public NetworkTask(String url, ContentValues values){
+            this.url = url;
+            this.values = values;
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            String result;  //요청 결과를 저장할 변수
+            RequestHttpURLConnection requestHttpURLConnection = new RequestHttpURLConnection();
+            result = requestHttpURLConnection.request(url, values);//얻어오는 코드
+
+            return result;
+        }
+    }
     Handler handler = new Handler() {
 
         @Override
@@ -316,9 +348,11 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                     if(bool_onRegister) {
                         //btn_map_widget.setVisibility(View.VISIBLE);
                         view_userInfo.setVisibility(View.VISIBLE);
+                        view_droneimg.setVisibility(View.VISIBLE);
                     }
                     else{
                         view_userInfo.setVisibility(View.INVISIBLE);
+                        view_droneimg.setVisibility(View.INVISIBLE);
                         //btn_map_widget.setVisibility(View.INVISIBLE);
                     }
                     break;
@@ -452,27 +486,28 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
 
     @Override
     public void onClick(View view) {
-        Class nextActivityClass;
+        Class nextActivityClass = null;
 
         int id = view.getId();
         if (id == R.id.complete_ui_widgets) {
             nextActivityClass = CompleteWidgetActivity.class;
         } else if (id == R.id.bt_customized_ui_widgets) {
             nextActivityClass = CustomizedWidgetsActivity.class;
-        } else {
-            nextActivityClass = Webrtc1.class;
+        }
+        else {
+        //nextActivityClass = Webrtc1.class;
 
-            /*
-            PopupMenu popup = new PopupMenu(this, view);
-            popup.setOnMenuItemClickListener(this);
-            Menu popupMenu = popup.getMenu();
-            MenuInflater inflater = popup.getMenuInflater();
-            inflater.inflate(R.menu.map_select_menu, popupMenu);
-            popupMenu.findItem(R.id.here_map).setEnabled(isHereMapsSupported());
-            popupMenu.findItem(R.id.google_map).setEnabled(isGoogleMapsSupported(this));
-            popup.show();
-            return;
-            */
+        /*
+        PopupMenu popup = new PopupMenu(this, view);
+        popup.setOnMenuItemClickListener(this);
+        Menu popupMenu = popup.getMenu();
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.map_select_menu, popupMenu);
+        popupMenu.findItem(R.id.here_map).setEnabled(isHereMapsSupported());
+        popupMenu.findItem(R.id.google_map).setEnabled(isGoogleMapsSupported(this));
+        popup.show();
+        return;
+        */
 
 
         }

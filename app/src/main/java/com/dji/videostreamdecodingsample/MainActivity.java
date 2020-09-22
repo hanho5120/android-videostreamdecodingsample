@@ -31,7 +31,9 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.internal.Objects;
+import com.google.gson.JsonObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -250,8 +252,19 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
 
                 Userdata.getInstance()._pw=edit_pwText.getText().toString();
 
-                Intent intent = new Intent(MainActivity.this, Webrtc1.class);
-                startActivity(intent);
+
+                /* DB 대조 */
+                ContentValues values = new ContentValues();
+                //values.put("login_key", "24d2bd1d-5617-46cd-a49c-e1ecbb69fc4d");
+                JsonObject temp = new JsonObject();
+
+                temp.addProperty("login_key", "24d2bd1d-5617-46cd-a49c-e1ecbb69fc4d");
+                NetworkTask networkTask = new NetworkTask("https://101.55.28.64:444/api/get-conference-list ", temp);
+                networkTask.execute();
+
+
+                //Intent intent = new Intent(MainActivity.this, Webrtc1.class);
+                //startActivity(intent);
             }
         });
 
@@ -318,9 +331,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
     public class  NetworkTask extends AsyncTask<Void, Void, String>{
 
         private String url;
-        private ContentValues values;
+        private JsonObject values;
 
-        public NetworkTask(String url, ContentValues values){
+        public NetworkTask(String url, JsonObject values){
             this.url = url;
             this.values = values;
         }

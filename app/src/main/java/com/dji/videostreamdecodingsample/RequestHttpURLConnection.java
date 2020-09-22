@@ -9,8 +9,25 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
+import javax.net.ssl.HttpsURLConnection;
+
+
+
+import java.net.URISyntaxException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
+import java.util.Arrays;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
 
 public class RequestHttpURLConnection {
+
+
+
 
     public String request(String _url, ContentValues _params){
 
@@ -54,8 +71,31 @@ public class RequestHttpURLConnection {
          * 2. HttpURLConnection을 통해 web의 데이터를 가져온다.
          * */
         try{
+            TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+                public java.security.cert.X509Certificate[] getAcceptedIssuers()
+                {
+                    return null;
+                }
+
+                public void checkClientTrusted(X509Certificate[] certs, String authType)
+                {
+
+                }
+                public void checkServerTrusted(X509Certificate[] certs, String authType)
+                {
+
+                }
+            }
+            };
+
+            SSLContext sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            HttpsURLConnection .setDefaultSSLSocketFactory(sc.getSocketFactory());
+
+
+
             URL url = new URL(_url);
-            urlConn = (HttpURLConnection) url.openConnection();
+            urlConn = (HttpsURLConnection) url.openConnection();
 
             // [2-1]. urlConn 설정.
             urlConn.setRequestMethod("POST"); // URL 요청에 대한 메소드 설정 : POST.
@@ -92,6 +132,10 @@ public class RequestHttpURLConnection {
         } catch (MalformedURLException e) { // for URL.
             e.printStackTrace();
         } catch (IOException e) { // for openConnection().
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (KeyManagementException e) {
             e.printStackTrace();
         } finally {
             if (urlConn != null)

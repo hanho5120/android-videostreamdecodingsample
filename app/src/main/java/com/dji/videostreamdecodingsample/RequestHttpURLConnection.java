@@ -2,6 +2,8 @@ package com.dji.videostreamdecodingsample;
 
 import android.content.ContentValues;
 
+import com.google.gson.JsonObject;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -68,41 +70,13 @@ public class RequestHttpURLConnection {
 
 
 
-    public String request(String _url, ContentValues _params){
+    public String request(String _url, JsonObject jsondata){
 
         // HttpURLConnection 참조 변수.
         HttpsURLConnection urlConn = null;
         // URL 뒤에 붙여서 보낼 파라미터.
         StringBuffer sbParams = new StringBuffer();
 
-
-        // 보낼 데이터가 없으면 파라미터를 비운다.
-        if (_params == null)
-            sbParams.append("");
-            // 보낼 데이터가 있으면 파라미터를 채운다.
-        else {
-            // 파라미터가 2개 이상이면 파라미터 연결에 &가 필요하므로 스위칭할 변수 생성.
-            boolean isAnd = false;
-            // 파라미터 키와 값.
-            String key;
-            String value;
-
-            for(Map.Entry<String, Object> parameter : _params.valueSet()){
-                key = parameter.getKey();
-                value = parameter.getValue().toString();
-
-                // 파라미터가 두개 이상일때, 파라미터 사이에 &를 붙인다.
-                if (isAnd)
-                    sbParams.append("&");
-
-                sbParams.append(key).append("=").append(value);
-
-                // 파라미터가 2개 이상이면 isAnd를 true로 바꾸고 다음 루프부터 &를 붙인다.
-                if (!isAnd)
-                    if (_params.size() >= 2)
-                        isAnd = true;
-            }
-        }
 
         /**
          * 2. HttpURLConnection을 통해 web의 데이터를 가져온다.
@@ -123,12 +97,9 @@ public class RequestHttpURLConnection {
             urlConn.setRequestProperty("Accept", "application/json");
 
 
-            JSONObject parent = new JSONObject();
-            parent.put("login_key","24d2bd1d-5617-46cd-a49c-e1ecbb69fc4d");
 
-            String temp = parent.toString();
             // [2-2]. parameter 전달 및 데이터 읽어오기.
-            String strParams = parent.toString(); //sbParams에 정리한 파라미터들을 스트링으로 저장. 예)id=id1&pw=123;
+            String strParams = jsondata.toString(); //sbParams에 정리한 파라미터들을 스트링으로 저장. 예)id=id1&pw=123;
             OutputStreamWriter os = new OutputStreamWriter(urlConn.getOutputStream());
             os.write(strParams); // 출력 스트림에 출력.
             os.flush(); // 출력 스트림을 플러시(비운다)하고 버퍼링 된 모든 출력 바이트를 강제 실행.
@@ -157,8 +128,6 @@ public class RequestHttpURLConnection {
         } catch (MalformedURLException e) { // for URL.
             e.printStackTrace();
         } catch (IOException e) { // for openConnection().
-            e.printStackTrace();
-        } catch (JSONException e) {
             e.printStackTrace();
         } finally {
             if (urlConn != null)

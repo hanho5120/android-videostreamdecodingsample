@@ -1,10 +1,15 @@
 package com.dji.videostreamdecodingsample;
 
 import android.content.ContentValues;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -12,19 +17,53 @@ import java.util.Map;
 import javax.net.ssl.HttpsURLConnection;
 
 
-
-import java.net.URISyntaxException;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.Arrays;
-
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 
+
 public class RequestHttpURLConnection {
+
+
+    final  HostnameVerifier DO_NOT_VERIFY = new HostnameVerifier() {
+        public boolean verify(String hostname, SSLSession session) {
+            return true;
+        }
+    };
+
+    private void trustAllHosts() {
+        // Create a trust manager that does not validate certificate chains
+        TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                return new java.security.cert.X509Certificate[] {};
+            }
+
+            @Override
+            public void checkClientTrusted(X509Certificate[] chain,
+                                           String authType) throws CertificateException {
+            }
+
+            @Override
+            public void checkServerTrusted(X509Certificate[] chain,
+                                           String authType) throws CertificateException {
+            }
+        }};
+
+        // Install the all-trusting trust manager
+        try {
+            SSLContext sc = SSLContext.getInstance("TLS");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 
 
@@ -32,7 +71,7 @@ public class RequestHttpURLConnection {
     public String request(String _url, ContentValues _params){
 
         // HttpURLConnection 참조 변수.
-        HttpURLConnection urlConn = null;
+        HttpsURLConnection urlConn = null;
         // URL 뒤에 붙여서 보낼 파라미터.
         StringBuffer sbParams = new StringBuffer();
 
@@ -69,41 +108,29 @@ public class RequestHttpURLConnection {
          * 2. HttpURLConnection을 통해 web의 데이터를 가져온다.
          * */
         try{
-            TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
-                public java.security.cert.X509Certificate[] getAcceptedIssuers()
-                {
-                    return null;
-                }
 
-                public void checkClientTrusted(X509Certificate[] certs, String authType)
-                {
-
-                }
-                public void checkServerTrusted(X509Certificate[] certs, String authType)
-                {
-
-                }
-            }
-            };
-
-            SSLContext sc = SSLContext.getInstance("SSL");
-            sc.init(null, trustAllCerts, new java.security.SecureRandom());
-            HttpsURLConnection .setDefaultSSLSocketFactory(sc.getSocketFactory());
-
-
+            trustAllHosts();
 
             URL url = new URL(_url);
             urlConn = (HttpsURLConnection) url.openConnection();
+            urlConn.setHostnameVerifier(DO_NOT_VERIFY);
+            urlConn.setConnectTimeout(1000);
+            urlConn.setReadTimeout(1000);
 
-            // [2-1]. urlConn 설정.
-            urlConn.setRequestMethod("POST"); // URL 요청에 대한 메소드 설정 : POST.
-            urlConn.setRequestProperty("Accept-Charset", "UTF-8"); // Accept-Charset 설정.
-            urlConn.setRequestProperty("Context_Type", "application/x-www-form-urlencoded;cahrset=UTF-8");
 
+            urlConn.setRequestMethod("POST"); // URL 요청에 대한 메소드 설정 : POST.// Accept-Charset 설정.
+            urlConn.setRequestProperty("Content-Type", "application/json");
+            urlConn.setRequestProperty("Accept", "application/json");
+
+
+            JSONObject parent = new JSONObject();
+            parent.put("login_key","24d2bd1d-5617-46cd-a49c-e1ecbb69fc4d");
+
+            String temp = parent.toString();
             // [2-2]. parameter 전달 및 데이터 읽어오기.
-            String strParams = sbParams.toString(); //sbParams에 정리한 파라미터들을 스트링으로 저장. 예)id=id1&pw=123;
-            OutputStream os = urlConn.getOutputStream();
-            os.write(strParams.getBytes("UTF-8")); // 출력 스트림에 출력.
+            String strParams = parent.toString(); //sbParams에 정리한 파라미터들을 스트링으로 저장. 예)id=id1&pw=123;
+            OutputStreamWriter os = new OutputStreamWriter(urlConn.getOutputStream());
+            os.write(strParams); // 출력 스트림에 출력.
             os.flush(); // 출력 스트림을 플러시(비운다)하고 버퍼링 된 모든 출력 바이트를 강제 실행.
             os.close(); // 출력 스트림을 닫고 모든 시스템 자원을 해제.
 
@@ -131,9 +158,7 @@ public class RequestHttpURLConnection {
             e.printStackTrace();
         } catch (IOException e) { // for openConnection().
             e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (KeyManagementException e) {
+        } catch (JSONException e) {
             e.printStackTrace();
         } finally {
             if (urlConn != null)

@@ -250,8 +250,16 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
 
                 Userdata.getInstance()._pw=edit_pwText.getText().toString();
 
-                Intent intent = new Intent(MainActivity.this, Webrtc1.class);
-                startActivity(intent);
+
+                /* DB 대조 */
+                ContentValues values = new ContentValues();
+                values.put("login_key", "24d2bd1d-5617-46cd-a49c-e1ecbb69fc4d");
+                NetworkTask networkTask = new NetworkTask("https://101.55.28.64:444/api/get-conference-list ", values);
+                networkTask.execute();
+
+
+                //Intent intent = new Intent(MainActivity.this, Webrtc1.class);
+                //startActivity(intent);
             }
         });
 

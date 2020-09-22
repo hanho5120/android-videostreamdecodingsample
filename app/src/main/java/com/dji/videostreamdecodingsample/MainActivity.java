@@ -41,6 +41,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import dji.common.error.DJIError;
 import dji.common.error.DJISDKError;
 import dji.common.useraccount.UserAccountState;
@@ -48,6 +52,7 @@ import dji.common.util.CommonCallbacks;
 import dji.log.DJILog;
 import dji.sdk.base.BaseComponent;
 import dji.sdk.base.BaseProduct;
+import dji.sdk.flighthub.model.User;
 import dji.sdk.sdkmanager.DJISDKInitEvent;
 import dji.sdk.sdkmanager.DJISDKManager;
 import dji.sdk.useraccount.UserAccountManager;
@@ -71,6 +76,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
     View view_droneimg;
     View view_background;
     Button btn_exit;
+
 
     //값 체크 부분 리스트
     public static boolean bool_onRegister = false;
@@ -213,6 +219,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
         btn_map_widget = (Button) findViewById(R.id.btn_map_widget);
 
         //로그인정보
+
         view_userInfo = (View) findViewById(R.id.view_userInfo);
         view_droneimg = (View) findViewById(R.id.view_droneimg);
         view_background = (View) findViewById(R.id.view_background);
@@ -248,10 +255,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                 intent.putExtra("dronepw",dronepw);
 
 */
-                Userdata.getInstance()._id=edit_idText.getText().toString();
+                //Userdata.getInstance()._id=edit_idText.getText().toString();
 
                 Userdata.getInstance()._pw=edit_pwText.getText().toString();
-
 
                 /* DB 대조 */
                 ContentValues values = new ContentValues();
@@ -262,12 +268,13 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                 NetworkTask networkTask = new NetworkTask("https://101.55.28.64:444/api/get-conference-list ", temp);
                 networkTask.execute();
 
+                //edit_idText에 들어왔는지 찍어봐
+                //Toast.makeText(getApplicationContext(), Userdata.getInstance()._profile_photo.toString(), Toast.LENGTH_LONG).show();
 
                 //Intent intent = new Intent(MainActivity.this, Webrtc1.class);
                 //startActivity(intent);
             }
         });
-
 
 
 
@@ -345,6 +352,37 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
             result = requestHttpURLConnection.request(url, values);//얻어오는 코드
 
             return result;
+        }
+        @Override
+        protected void onPostExecute(String s){
+            super.onPostExecute(s);
+            try {
+                JSONObject jsonObject = new JSONObject(s);
+                Userdata.getInstance()._code = jsonObject.getInt("code");
+                Userdata.getInstance()._message = jsonObject.getString("message");
+
+                JSONObject jsonObject1 = new JSONObject(jsonObject.getString("data"));
+                Userdata.getInstance()._room_key = jsonObject1.getString("room_key");
+                Userdata.getInstance()._caller_id = jsonObject1.getString("caller_id");
+                Userdata.getInstance()._room_id = jsonObject1.getString("room_id");
+                Userdata.getInstance()._title = jsonObject1.getString("title");
+                Userdata.getInstance()._reservation_yn = jsonObject1.getString("reservation_yn");
+                Userdata.getInstance()._reservation_date = jsonObject1.getString("reservation_date");
+                Userdata.getInstance()._reservation_time = jsonObject1.getString("reservation_time");
+                Userdata.getInstance()._status = jsonObject1.getString("status");
+                Userdata.getInstance()._reg_date = jsonObject1.getString("reg_date");
+                Userdata.getInstance()._start_date = jsonObject1.getString("start_date");
+                Userdata.getInstance()._name = jsonObject1.getString("name");
+                Userdata.getInstance()._profile_photo = jsonObject1.getString("profile_photo");
+
+                if(Userdata.getInstance()._message !="success" || Userdata.getInstance()._room_key != "") {
+                    Intent intent = new Intent(MainActivity.this, Webrtc1.class);
+                    startActivity(intent);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
         }
     }
     Handler handler = new Handler() {

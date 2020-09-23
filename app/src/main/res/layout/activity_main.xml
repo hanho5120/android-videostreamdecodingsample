@@ -151,7 +151,7 @@
             android:background="#19181D"
             android:drawableStart="@drawable/ic_baseline_https_24"
             android:gravity="center"
-            android:hint="   드론의 비밀번호를 입력하세요."
+            android:hint="  드론의 비밀번호를 입력하세요."
             android:inputType="textPassword"
             android:maxLength="15"
             android:maxLines="1"

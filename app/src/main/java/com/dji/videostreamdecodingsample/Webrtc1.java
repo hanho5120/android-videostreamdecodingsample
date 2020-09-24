@@ -112,8 +112,6 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
     private static DemoType demoType = DemoType.USE_SURFACE_VIEW;
     private VideoFeeder.VideoFeed standardVideoFeeder;
 
-    TextView TextView_getid;
-    TextView TextView_getpw;
     protected VideoFeeder.VideoDataListener mReceivedVideoDataListener = null;
     private TextView titleTv;
     public Handler mainHandler = new Handler(Looper.getMainLooper()) {
@@ -773,9 +771,6 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
         setContentView(R.layout.activity_webrtc1);
         initUi();
 
-        TextView_getid = findViewById(R.id.TextView_getid);
-        TextView_getpw = findViewById(R.id.TextView_getpw);
-
         //Intent intent = getIntent();
         //Bundle bundle = intent.getExtras();
         //String getdroneid = bundle.getString("droneid");
@@ -783,8 +778,7 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
 
         //TextView_getid.setText(getdroneid);
         //TextView_getpw.setText(getdronepw);
-        TextView_getid.setText(Userdata.getInstance()._id);
-        TextView_getpw.setText(Userdata.getInstance()._pw);
+
 
     }
 
@@ -1290,7 +1284,7 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
     private void handleYUVClick() {
 
         if (screenShot.isSelected()) {
-            screenShot.setText("YUV Screen Shot");
+            screenShot.setText("관제 시작");
             screenShot.setSelected(false);
 
 
@@ -1312,7 +1306,7 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
             savePath.setVisibility(View.INVISIBLE);
             stringBuilder = null;
         } else {
-            screenShot.setText("Live Stream");
+            screenShot.setText("관제 중지");
             screenShot.setSelected(true);
 
             switch (demoType) {

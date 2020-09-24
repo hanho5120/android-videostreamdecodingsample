@@ -41,6 +41,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import dji.common.error.DJIError;
 import dji.common.error.DJISDKError;
 import dji.common.useraccount.UserAccountState;
@@ -48,6 +52,7 @@ import dji.common.util.CommonCallbacks;
 import dji.log.DJILog;
 import dji.sdk.base.BaseComponent;
 import dji.sdk.base.BaseProduct;
+import dji.sdk.flighthub.model.User;
 import dji.sdk.sdkmanager.DJISDKInitEvent;
 import dji.sdk.sdkmanager.DJISDKManager;
 import dji.sdk.useraccount.UserAccountManager;
@@ -72,15 +77,15 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
     View view_background;
     Button btn_exit;
 
+
     //값 체크 부분 리스트
     public static boolean bool_onRegister = false;
+    public static boolean bool_onProductConnect = false;
 
     public static StringBuilder LOG = new StringBuilder();
 
     public static final int SEND_LOG = 0;
     public static final int SEND_VIS = 1;
-
-
 
 
     private DJISDKManager.SDKManagerCallback registrationCallback = new DJISDKManager.SDKManagerCallback() {
@@ -92,15 +97,13 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                 //loginAccount();
                 DJISDKManager.getInstance().startConnectionToProduct();
 
-                Toast.makeText(getApplicationContext(), "SDK registration succeeded!", Toast.LENGTH_LONG).show();
+                //Toast.makeText(getApplicationContext(), "SDK registration succeeded!", Toast.LENGTH_LONG).show();
                 bool_onRegister = true;
                 //LOG.append("SDK 등록 성공"+"\n");
                 LOG.append("SDK 등록 성공, ");
                 //bt_map_widget.setVisibility(View.VISIBLE);
             } else {
-                Toast.makeText(getApplicationContext(),
-                        "SDK registration failed, check network and retry!",
-                        Toast.LENGTH_LONG).show();
+                //Toast.makeText(getApplicationContext(),"SDK registration failed, check network and retry!",Toast.LENGTH_LONG).show();
                 bool_onRegister = false;
                 //LOG.append("SDK 등록 실패"+"\n");
                 LOG.append("SDK 등록 실패, ");
@@ -109,20 +112,18 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
 
         @Override
         public void onProductDisconnect() {
-            Toast.makeText(getApplicationContext(),
-                    "product disconnect!",
-                    Toast.LENGTH_LONG).show();
+            //Toast.makeText(getApplicationContext(),"product disconnect!",Toast.LENGTH_LONG).show();
             //LOG.append("제품 연결 안 됨"+"\n");
+            bool_onProductConnect = false;
             LOG.append("제품 연결 안 됨, ");
         }
 
         @Override
         public void onProductConnect(BaseProduct product) {
-            Toast.makeText(getApplicationContext(),
-                    "product connect!",
-                    Toast.LENGTH_LONG).show();
+            //Toast.makeText(getApplicationContext(),"product connect!",Toast.LENGTH_LONG).show();
             //LOG.append("제품 연결 됨"+"\n");
-            LOG.append("제품 연결 됨"+"\n");
+            bool_onProductConnect = true;
+            LOG.append("제품 연결 됨, ");
         }
 
         @Override
@@ -134,9 +135,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
         public void onComponentChange(BaseProduct.ComponentKey key,
                                       BaseComponent oldComponent,
                                       BaseComponent newComponent) {
-            Toast.makeText(getApplicationContext(),
-                    key.toString() + " changed",
-                    Toast.LENGTH_LONG).show();
+            //Toast.makeText(getApplicationContext(),key.toString() + " changed",Toast.LENGTH_LONG).show();
             //LOG.append("컴포넌트 변경 됨"+"\n");
             LOG.append("컴포넌트 변경 됨, ");
         }
@@ -157,18 +156,14 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                 new CommonCallbacks.CompletionCallbackWith<UserAccountState>() {
                     @Override
                     public void onSuccess(final UserAccountState userAccountState) {
-                        Toast.makeText(getApplicationContext(),
-                                "Login Success!",
-                                Toast.LENGTH_LONG).show();
+                        //Toast.makeText(getApplicationContext(),"Login Success!",Toast.LENGTH_LONG).show();
                         //LOG.append("로그인 성공"+"\n");
                         LOG.append("로그인 성공, ");
                     }
 
                     @Override
                     public void onFailure(DJIError error) {
-                        Toast.makeText(getApplicationContext(),
-                                "Login Error!",
-                                Toast.LENGTH_LONG).show();
+                        //Toast.makeText(getApplicationContext(),"Login Error!",Toast.LENGTH_LONG).show();
                         //LOG.append("로그인 에러"+"\n");
                         LOG.append("로그인 에러, ");
                     }
@@ -213,6 +208,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
         btn_map_widget = (Button) findViewById(R.id.btn_map_widget);
 
         //로그인정보
+
         view_userInfo = (View) findViewById(R.id.view_userInfo);
         view_droneimg = (View) findViewById(R.id.view_droneimg);
         view_background = (View) findViewById(R.id.view_background);
@@ -220,7 +216,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
 
             @Override
             public void onClick(View v) {
-                bool_onRegister=true;
+                //bool_onRegister=true;
             }
         });
         edit_idText = (TextView) findViewById(R.id.edit_idText);
@@ -231,7 +227,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
             @Override
             public void onClick(View v) {
                 //view_userInfo.setVisibility(View.INVISIBLE);
-                bool_onRegister = false;
+                //bool_onRegister = false;
             }
         });
         findViewById(R.id.btn_map_widget).setOnClickListener(this);
@@ -248,10 +244,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                 intent.putExtra("dronepw",dronepw);
 
 */
-                Userdata.getInstance()._id=edit_idText.getText().toString();
+                Userdata.getInstance()._id = edit_idText.getText().toString();
 
-                Userdata.getInstance()._pw=edit_pwText.getText().toString();
-
+                Userdata.getInstance()._pw = edit_pwText.getText().toString();
 
                 /* DB 대조 */
                 ContentValues values = new ContentValues();
@@ -260,14 +255,19 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
 
                 temp.addProperty("login_key", "24d2bd1d-5617-46cd-a49c-e1ecbb69fc4d");
                 NetworkTask networkTask = new NetworkTask("https://101.55.28.64:444/api/get-conference-list ", temp);
-                networkTask.execute();
+                //LOG.append(Userdata.getInstance()._id.toString() +", "+Userdata.getInstance()._pw.toString()+", ");
+                if(Userdata.getInstance()._id.equals("") || Userdata.getInstance()._pw.equals(""))
+                    LOG.append("ID 또는 PW를 확인해주세요, ");
+                else
+                    networkTask.execute();
 
+                //edit_idText에 들어왔는지 찍어봐
+                //Toast.makeText(getApplicationContext(), Userdata.getInstance()._profile_photo.toString(), Toast.LENGTH_LONG).show();
 
                 //Intent intent = new Intent(MainActivity.this, Webrtc1.class);
                 //startActivity(intent);
             }
         });
-
 
 
 
@@ -346,6 +346,41 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
 
             return result;
         }
+        @Override
+        protected void onPostExecute(String s){
+            super.onPostExecute(s);
+            try {
+                JSONObject jsonObject = new JSONObject(s);
+                Userdata.getInstance()._code = jsonObject.getInt("code");
+                Userdata.getInstance()._message = jsonObject.getString("message");
+
+                JSONObject jsonObject1 = new JSONObject(jsonObject.getString("data"));
+                Userdata.getInstance()._room_key = jsonObject1.getString("room_key");
+                Userdata.getInstance()._caller_id = jsonObject1.getString("caller_id");
+                Userdata.getInstance()._room_id = jsonObject1.getString("room_id");
+                Userdata.getInstance()._title = jsonObject1.getString("title");
+                Userdata.getInstance()._reservation_yn = jsonObject1.getString("reservation_yn");
+                Userdata.getInstance()._reservation_date = jsonObject1.getString("reservation_date");
+                Userdata.getInstance()._reservation_time = jsonObject1.getString("reservation_time");
+                Userdata.getInstance()._status = jsonObject1.getString("status");
+                Userdata.getInstance()._reg_date = jsonObject1.getString("reg_date");
+                Userdata.getInstance()._start_date = jsonObject1.getString("start_date");
+                Userdata.getInstance()._name = jsonObject1.getString("name");
+                Userdata.getInstance()._profile_photo = jsonObject1.getString("profile_photo");
+
+                if(Userdata.getInstance()._message !="success" || Userdata.getInstance()._room_key != "" ) {
+                    Intent intent = new Intent(MainActivity.this, Webrtc1.class);
+                    startActivity(intent);
+                }
+                else{
+                    LOG.append("에러 발생! 관리자에게 문의하세요. , ");
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
     }
     Handler handler = new Handler() {
 
@@ -358,7 +393,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                     stateText.setText(msg.obj.toString());
                     break;
                 case SEND_VIS:
-                    if(bool_onRegister) {
+                    if(bool_onRegister && bool_onProductConnect) {
+                    //if(bool_onRegister) {
                         //btn_map_widget.setVisibility(View.VISIBLE);
                         view_userInfo.setVisibility(View.VISIBLE);
                         view_droneimg.setVisibility(View.VISIBLE);
@@ -482,7 +518,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
         if (missingPermission.isEmpty()) {
             startSDKRegistration();
         } else {
-            Toast.makeText(getApplicationContext(), "Missing permissions! Will not register SDK to connect to aircraft.", Toast.LENGTH_LONG).show();
+            //Toast.makeText(getApplicationContext(), "Missing permissions! Will not register SDK to connect to aircraft.", Toast.LENGTH_LONG).show();
+            LOG.append("SDK와 드론이 연결되지 않음, ");
         }
     }
 
@@ -578,7 +615,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
 
         if (!TextUtils.isEmpty(bridgeIP)) {
             DJISDKManager.getInstance().enableBridgeModeWithBridgeAppIP(bridgeIP);
-            Toast.makeText(getApplicationContext(),"BridgeMode ON!\nIP: " + bridgeIP,Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(),"BridgeMode ON!\nIP: " + bridgeIP,Toast.LENGTH_SHORT).show();
+            LOG.append("bridge 모드 ON, ");
             PreferenceManager.getDefaultSharedPreferences(this).edit().putString(LAST_USED_BRIDGE_IP,bridgeIP).apply();
         }
     }

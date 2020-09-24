@@ -12,7 +12,7 @@
     <RelativeLayout
         android:id="@+id/main_title_rl"
         android:layout_width="fill_parent"
-        android:layout_height="40dp"
+        android:layout_height="30dp"
         android:background="@color/title_dark">
 
         <TextView
@@ -39,12 +39,12 @@
 
     <SurfaceView
         android:id="@+id/livestream_preview_sf"
-        android:layout_width="360dp"
-        android:layout_height="180dp"
+        android:layout_width="480dp"
+        android:layout_height="270dp"
+        android:layout_below="@id/main_title_rl"
         android:layout_centerInParent="true"
         android:layout_gravity="center"
-        android:visibility="gone"
-        android:layout_below="@id/main_title_rl"/>
+        android:visibility="visible" />
 
     <org.webrtc.SurfaceViewRenderer
         android:id="@+id/surface_view"
@@ -62,8 +62,8 @@
     <LinearLayout
         android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@id/main_title_rl"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
         android:orientation="vertical">
 
         <Button
@@ -73,7 +73,8 @@
             android:text="Demo TextureView"
             android:clickable="true"
             android:onClick="onClick"
-            android:gravity="center"  />
+            android:gravity="center"
+            android:visibility="gone"/>
 
         <Button
             android:id="@+id/activity_main_screen_surface_with_own_decoder"
@@ -82,7 +83,8 @@
             android:text="Demo custom decoder"
             android:clickable="true"
             android:onClick="onClick"
-            android:gravity="center" />
+            android:gravity="center"
+            android:visibility="gone"/>
 
         <Button
             android:id="@+id/activity_main_screen_surface"
@@ -90,14 +92,15 @@
             android:layout_height="wrap_content"
             android:text="Demo SurfaceView"
             android:onClick="onClick"
-            android:gravity="center" />
+            android:gravity="center"
+            android:visibility="gone"/>
 
 
         <Button
             android:id="@+id/activity_main_screen_shot"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:text="Login Webrtc"
+            android:text="관제 시작"
             android:clickable="true"
             android:onClick="onClick"
             android:gravity="center" />
@@ -122,12 +125,14 @@
 
         />
 
+    <!--edit 확인용-->
     <LinearLayout
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="gone">
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -143,14 +148,15 @@
 
     </LinearLayout>
 
+    <!--이륙 버튼-->
     <LinearLayout
         android:id="@+id/TakeOffReturnPanel"
         android:layout_width="40dp"
         android:layout_height="wrap_content"
         android:layout_above="@+id/dashboard_widget"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="12dp"
-        android:layout_marginBottom="80dp"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="12dp"
+        android:layout_marginBottom="100dp"
         android:gravity="right"
         android:orientation="vertical">
 
@@ -167,7 +173,7 @@
     </LinearLayout>
 
 
-
+    <!--대시보드-->
     <LinearLayout
         android:id="@+id/dashboard_widget"
         android:layout_width="427dp"

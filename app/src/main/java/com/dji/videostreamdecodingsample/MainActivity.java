@@ -394,6 +394,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                     break;
                 case SEND_VIS:
                     if(bool_onRegister && bool_onProductConnect) {
+                    //디버그용
                     //if(bool_onRegister) {
                         //btn_map_widget.setVisibility(View.VISIBLE);
                         view_userInfo.setVisibility(View.VISIBLE);

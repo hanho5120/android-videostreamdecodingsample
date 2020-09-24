@@ -25,7 +25,7 @@ public class CustomizedWidgetsActivity extends Activity implements View.OnClickL
     }
 
     private void initView() {
-        fpvWidget = (FPVWidget)findViewById(R.id.fpv_custom_widget);
+        fpvWidget = (FPVWidget) findViewById(R.id.fpv_custom_widget);
         fpvOverlayWidget = (FPVOverlayWidget) findViewById(R.id.fpv_overlay_widget);
         secondaryFpvWidget = (FPVWidget)findViewById(R.id.secondary_fpv_custom_widget);
         ((CheckBox) findViewById(R.id.checkbox_primary_camera_name)).setOnCheckedChangeListener(this);

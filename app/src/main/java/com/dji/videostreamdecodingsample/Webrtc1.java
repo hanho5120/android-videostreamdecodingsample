@@ -21,6 +21,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import org.json.JSONException;
@@ -82,11 +83,13 @@ import dji.common.camera.SettingsDefinitions;
 import dji.common.error.DJIError;
 import dji.common.product.Model;
 import dji.common.util.CommonCallbacks;
+import dji.midware.media.transcode.online.Frame;
 import dji.sdk.base.BaseProduct;
 import dji.sdk.camera.Camera;
 import dji.sdk.camera.VideoFeeder;
 import dji.sdk.codec.DJICodecManager;
 import dji.thirdparty.afinal.core.AsyncTask;
+import dji.ux.widget.FPVWidget;
 import io.socket.client.Socket;
 
 import java.io.UnsupportedEncodingException;
@@ -135,6 +138,13 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
 
     private TextureView videostreamPreviewTtView;
     private SurfaceView videostreamPreviewSf;
+    //private FrameLayout videostreamPreviewSf;
+    //private FPVOverlayWidget webrtc1_Fpv_olw;
+    //private FPVWidget webrtc1_Fpv_w;
+
+    private FPVWidget fpvWidget_webrtc1;
+    private RelativeLayout primaryVideoView_webrtc1;
+
     private SurfaceHolder videostreamPreviewSh;
     private Camera mCamera;
     private DJICodecManager mCodecManager;
@@ -801,6 +811,21 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
         titleTv = (TextView) findViewById(R.id.title_tv);
         videostreamPreviewTtView = (TextureView) findViewById(R.id.livestream_preview_ttv);
         videostreamPreviewSf = (SurfaceView) findViewById(R.id.livestream_preview_sf);
+        //webrtc1_Fpv_olw = (FPVOverlayWidget) findViewById(R.id.webrtc1_fpv_olw);
+        //webrtc1_Fpv_w = (FPVWidget) findViewById(R.id.webrtc1_fpv_w);
+
+        fpvWidget_webrtc1 = (FPVWidget) findViewById(R.id.fpv_widget_webrtc1);
+        fpvWidget_webrtc1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onViewClick(fpvWidget_webrtc1);
+            }
+
+
+        });
+        primaryVideoView_webrtc1 = (RelativeLayout) findViewById(R.id.fpv_container_webrtc1);
+
+        //videostreamPreviewSf = (FrameLayout) findViewById(R.id.livestream_preview_sf);
         videostreamPreviewSf.setClickable(true);
         videostreamPreviewSf.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -818,7 +843,10 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
         });
         updateUIVisibility();
     }
+    private void onViewClick(View view) {
 
+
+    }
     private void updateUIVisibility(){
         switch (demoType) {
             case USE_SURFACE_VIEW:

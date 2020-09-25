@@ -78,7 +78,26 @@ class SignallingClient {
             if (!roomName.isEmpty()) {
                 emitInitStatement(roomName);
             }
-            socket.emit("dron_join_room","12345");
+
+            JSONObject datalogin = new JSONObject();
+            try {
+                datalogin.put("login_key", "values");
+                datalogin.put("login_id", "values");
+                datalogin.put("status", "Y");
+                datalogin.put("type", "D");
+                datalogin.put("name", "드론");
+                datalogin.put("group_id", "b7172bde-297e-4a0e-8df9-9cd915a460b0");
+                datalogin.put("login_key", "values");
+                datalogin.put("group_name", "드론");
+                datalogin.put("'profile_photo'", "");
+                datalogin.put("room_key","" );
+                socket.emit("reg_login_id",datalogin);
+            }catch(JSONException e) {
+                e.printStackTrace();
+            }
+
+
+            socket.emit("join_room","roomid","roomkey");
 
             //room created event.
             socket.on("dron_created", args -> {

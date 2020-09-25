@@ -9,49 +9,8 @@
     tools:context=".MainActivity">
 
 
-    <RelativeLayout
-        android:id="@+id/fpv_container_webrtc1"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <dji.ux.widget.FPVWidget
-            android:id="@+id/fpv_widget_webrtc1"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_centerInParent="true"
-            custom:sourceCameraNameVisibility="true"
-            />
-
-    </RelativeLayout>
 
 
-    <RelativeLayout
-        android:id="@+id/main_title_rl"
-        android:layout_width="fill_parent"
-        android:layout_height="30dp"
-        android:background="@color/title_dark">
-
-        <TextView
-            android:id="@+id/title_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:textColor="@android:color/white"
-            android:text="@string/title_main_activity"/>
-
-    </RelativeLayout>
-
-
-
-
-
-    <SurfaceView
-        android:id="@+id/livestream_preview_sf"
-        android:layout_width="480dp"
-        android:layout_height="270dp"
-        android:layout_centerInParent="true"
-        android:layout_gravity="center"
-        android:visibility="visible" />
 
     <TextureView
         android:id="@+id/livestream_preview_ttv"
@@ -63,20 +22,30 @@
         android:visibility="visible"
         android:layout_below="@id/main_title_rl"/>
 
-
+    <SurfaceView
+        android:id="@+id/livestream_preview_sf"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/main_title_rl"
+        android:layout_centerInParent="true"
+        android:layout_gravity="center"
+        android:visibility="visible" />
 
     <org.webrtc.SurfaceViewRenderer
         android:id="@+id/surface_view"
         android:layout_width="match_parent"
-        android:layout_gravity="bottom|end"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:layout_gravity="center" />
 
     <org.webrtc.SurfaceViewRenderer
         android:id="@+id/surface_view_remote"
-        android:layout_width="249dp"
-        android:layout_height="118dp"
+        android:layout_width="1dp"
+        android:layout_height="1dp"
         android:layout_below="@id/main_title_rl"
         android:layout_marginTop="253dp" />
+
+
 
     <LinearLayout
         android:layout_width="150dp"
@@ -85,7 +54,6 @@
         android:layout_alignParentBottom="true"
         android:orientation="vertical">
 
-        <!--핸드폰 카메라 화면-->
         <Button
             android:id="@+id/activity_main_screen_texture"
             android:layout_width="150dp"
@@ -94,9 +62,8 @@
             android:clickable="true"
             android:onClick="onClick"
             android:gravity="center"
-            android:visibility="visible"/>
+            android:visibility="gone"/>
 
-        <!-- 아무것도 안나옴-->
         <Button
             android:id="@+id/activity_main_screen_surface_with_own_decoder"
             android:layout_width="150dp"
@@ -105,9 +72,8 @@
             android:clickable="true"
             android:onClick="onClick"
             android:gravity="center"
-            android:visibility="visible"/>
+            android:visibility="gone"/>
 
-        <!-- 드론 화면-->
         <Button
             android:id="@+id/activity_main_screen_surface"
             android:layout_width="150dp"
@@ -115,9 +81,9 @@
             android:text="Demo SurfaceView"
             android:onClick="onClick"
             android:gravity="center"
-            android:visibility="visible"/>
+            android:visibility="gone"/>
 
-        <!--??-->
+
         <Button
             android:id="@+id/activity_main_screen_shot"
             android:layout_width="150dp"
@@ -143,8 +109,32 @@
         android:padding="5dp"
         android:scrollbars="vertical"
         android:textColor="@color/colorWhite"
-        android:visibility="invisible"/>
+        android:visibility="invisible"
 
+        />
+
+
+    <LinearLayout
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical"
+        android:visibility="gone">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/TextView_getid"
+            android:text="받아온 id"
+            android:textSize="20sp"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/TextView_getpw"
+            android:text="받아온 pw"
+            android:textSize="20sp"/>
+
+    </LinearLayout>
 
     <!--이륙 버튼-->
     <LinearLayout
@@ -193,26 +183,6 @@
     android:layout_toRightOf="@id/activity_main_screen_shot"
 얘는 왜 오류지?
 -->
-    <!--
-    <dji.ux.widget.FPVOverlayWidget
-        android:id="@+id/webrtc1_fpv_olw"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        custom:overlayVideoSource="primary"/>
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/debug_2">
 
 
-    </FrameLayout>
-    -->
-    <!--
-    <dji.ux.widget.FPVWidget
-        android:id="@+id/webrtc1_fpv_w"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        custom:sourceCameraNameVisibility="true"
-        custom:videoSource="secondary"/>
-        -->
 </RelativeLayout>

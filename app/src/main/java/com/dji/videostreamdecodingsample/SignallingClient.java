@@ -96,7 +96,6 @@ class SignallingClient {
                 e.printStackTrace();
             }
 
-
             socket.emit("join_room","roomid","roomkey");
 
             //room created event.
@@ -130,7 +129,7 @@ class SignallingClient {
             socket.on("bye", args -> callback.onRemoteHangUp((String) args[0]));
 
             //messages - SDP and ICE candidates are transferred through this
-            socket.on("message", args -> {
+            socket.on("signal", args -> {
                 Log.d("SignallingClient", "message call() called with: args = [" + Arrays.toString(args) + "]");
                 if (args[0] instanceof String) {
                     Log.d("SignallingClient", "String received :: " + args[0]);
@@ -157,7 +156,6 @@ class SignallingClient {
                                // Sendcandi(new IceCandidate(data.getString("id"), data.getInt("label"), data.getString("candidate")));
                                callback.onIceCandidateReceived(data);
                             }
-
                         }
 
                     } catch (JSONException e) {
@@ -177,7 +175,7 @@ class SignallingClient {
 
     public void emitMessage(String message) {
         Log.d("SignallingClient", "emitMessage() called with: message = [" + message + "]");
-        socket.emit("message", message);
+        socket.emit("signal", message);
     }
 
     public void Sendcandi(IceCandidate iceCandidate)
@@ -189,7 +187,7 @@ class SignallingClient {
             object.put("label", iceCandidate.sdpMLineIndex);
             object.put("id", iceCandidate.sdpMid);
             object.put("candidate", iceCandidate.sdp);
-            socket.emit("message", object);
+            socket.emit("signal", object);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -202,7 +200,7 @@ class SignallingClient {
             obj.put("type", message.type.canonicalForm());
             obj.put("sdp", message.description);
             Log.d("emitMessage", obj.toString());
-            socket.emit("message", obj);
+            socket.emit("signal", obj);
             Log.d("vivek1794", obj.toString());
         } catch (JSONException e) {
             e.printStackTrace();
@@ -216,7 +214,7 @@ class SignallingClient {
             object.put("label", iceCandidate.sdpMLineIndex);
             object.put("id", iceCandidate.sdpMid);
             object.put("candidate", iceCandidate.sdp);
-            socket.emit("message", object);
+            socket.emit("signal", object);
         } catch (Exception e) {
             e.printStackTrace();
         }

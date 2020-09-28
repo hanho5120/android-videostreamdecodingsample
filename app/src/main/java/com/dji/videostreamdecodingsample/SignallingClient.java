@@ -96,7 +96,6 @@ class SignallingClient {
             }
 
             socket.emit("join_room",Userdata.getInstance()._room_id,Userdata.getInstance()._room_key);
-            socket.emit("join_room","roomid","roomkey");
 
             //room created event.
             socket.on("dron_created", args -> {

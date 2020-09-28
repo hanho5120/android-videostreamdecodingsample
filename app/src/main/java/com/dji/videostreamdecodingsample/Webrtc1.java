@@ -114,6 +114,7 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
     private enum DemoType { USE_TEXTURE_VIEW, USE_SURFACE_VIEW, USE_SURFACE_VIEW_DEMO_DECODER}
     private static DemoType demoType = DemoType.USE_SURFACE_VIEW;
     private VideoFeeder.VideoFeed standardVideoFeeder;
+    private ViewGroup parentView_webrtc1;
 
     protected VideoFeeder.VideoDataListener mReceivedVideoDataListener = null;
     private TextView titleTv;
@@ -183,7 +184,7 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
     final int ALL_PERMISSIONS_CODE = 1;
 
 
-
+//영상통화 형식으로 코덱 변경
     void Changeframe(byte[] videoBuffer, int size, int width, int height)
     {
 
@@ -221,17 +222,24 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
 
     private void initViews() {
 
+
         localVideoView = findViewById(R.id.surface_view);
         remoteVideoView = findViewById(R.id.surface_view_remote);
 
     }
 
     private void initVideos() {
-        rootEglBase = EglBase.create();
-        localVideoView.init(rootEglBase.getEglBaseContext(), null);
-        remoteVideoView.init(rootEglBase.getEglBaseContext(), null);
-        localVideoView.setZOrderMediaOverlay(true);
-        remoteVideoView.setZOrderMediaOverlay(true);
+        try {
+            rootEglBase = EglBase.create();
+            localVideoView.init(rootEglBase.getEglBaseContext(), null);
+            remoteVideoView.init(rootEglBase.getEglBaseContext(), null);
+            localVideoView.setZOrderMediaOverlay(true);
+            remoteVideoView.setZOrderMediaOverlay(true);
+        }
+        catch (Exception e)
+        {
+
+        }
     }
 
     private void getIceServers() {
@@ -311,6 +319,7 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
 
     }
 
+    //통신
     public void start() {
 
         if (localPeer != null) {
@@ -347,7 +356,9 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
 
         //Now create a VideoCapturer instance.
         VideoCapturer videoCapturerAndroid;
-        /*
+
+        //이하 webtrc 받는부분 복사해주는
+
         videoCapturerAndroid = new VideoCapturer() {
             @Override
             public void initialize(SurfaceTextureHelper surfaceTextureHelper, Context context, CapturerObserver capturerObserver) {
@@ -380,8 +391,11 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
             }
         };
 
-         */
-        videoCapturerAndroid = createCameraCapturer(new Camera1Enumerator(false));
+
+        //얘를 백그라운드로 돌리면서 스왑만 하면 되는지 아니면 막을지
+
+        //드론 테스트용임
+        //videoCapturerAndroid = createCameraCapturer(new Camera1Enumerator(false));
 
         //Create MediaConstraints - Will be useful for specifying video and audio constraints.
         audioConstraints = new MediaConstraints();
@@ -814,6 +828,10 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
         //webrtc1_Fpv_olw = (FPVOverlayWidget) findViewById(R.id.webrtc1_fpv_olw);
         //webrtc1_Fpv_w = (FPVWidget) findViewById(R.id.webrtc1_fpv_w);
 
+
+        /*
+        parentView_webrtc1 = (ViewGroup) findViewById(R.id.root_view_webrtc1);
+
         fpvWidget_webrtc1 = (FPVWidget) findViewById(R.id.fpv_widget_webrtc1);
         fpvWidget_webrtc1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -823,7 +841,9 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
 
 
         });
+
         primaryVideoView_webrtc1 = (RelativeLayout) findViewById(R.id.fpv_container_webrtc1);
+*/
 
         //videostreamPreviewSf = (FrameLayout) findViewById(R.id.livestream_preview_sf);
         videostreamPreviewSf.setClickable(true);
@@ -843,10 +863,8 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
         });
         updateUIVisibility();
     }
-    private void onViewClick(View view) {
 
 
-    }
     private void updateUIVisibility(){
         switch (demoType) {
             case USE_SURFACE_VIEW:
@@ -1199,6 +1217,7 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
     private void screenShot(byte[] buf, String shotDir, int width, int height) {
 
         int size = buf.length;
+
         Changeframe(buf,size,width,height);
         /*
         File dir = new File(shotDir);
@@ -1293,6 +1312,7 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
         switch (demoType) {
             case USE_SURFACE_VIEW:
 
+
                 break;
             case USE_TEXTURE_VIEW:
                 mCodecManager.enabledYuvData(false);
@@ -1315,13 +1335,22 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
             screenShot.setText("관제 시작");
             screenShot.setSelected(false);
 
+            //start함수 호출 넣기
 
             switch (demoType) {
                 case USE_SURFACE_VIEW:
+                    mCodecManager.enabledYuvData(false); // -> 캡쳐 정지
+                    mCodecManager.setYuvDataCallback(null);
+                    initPreviewerSurfaceView();
 
+                    //start();
+
+                    startActivity(getIntent());
                     break;
+                    //어디 타는지 경로 확인
+
                 case USE_TEXTURE_VIEW:
-                    mCodecManager.enabledYuvData(false);
+                    mCodecManager.enabledYuvData(false); // -> 캡쳐 정지
                     mCodecManager.setYuvDataCallback(null);
                     // ToDo:
                     break;
@@ -1330,20 +1359,27 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
                     DJIVideoStreamDecoder.getInstance().setYuvDataListener(null);
                     break;
             }
-            savePath.setText("");
-            savePath.setVisibility(View.INVISIBLE);
-            stringBuilder = null;
+            //savePath.setText("");
+            //savePath.setVisibility(View.INVISIBLE);
+            //stringBuilder = null;
         } else {
             screenShot.setText("관제 중지");
             screenShot.setSelected(true);
 
             switch (demoType) {
                 case USE_TEXTURE_VIEW:
-
                     break;
                 case USE_SURFACE_VIEW:
-                    mCodecManager.enabledYuvData(true);
+                    mCodecManager.enabledYuvData(true);  //->
                     mCodecManager.setYuvDataCallback(this);
+
+
+                    start();
+
+                    //한번만?
+
+                    //updateVideoViews(false);
+
                     break;
                 case USE_SURFACE_VIEW_DEMO_DECODER:
                     DJIVideoStreamDecoder.getInstance().changeSurface(null);

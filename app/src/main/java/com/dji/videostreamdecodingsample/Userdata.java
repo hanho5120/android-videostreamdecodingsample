@@ -5,8 +5,10 @@ public class Userdata{
 
     public String _id;
     public String _pw;
-
+  //추가
+//24d2bd1d-5617-46cd-a49c-e1ecbb69fc4d
     public int _code;
+    public String _login_key = "24d2bd1d-5617-46cd-a49c-e1ecbb69fc4d";
     public String _message;
     public String _room_key;
     public String _caller_id;

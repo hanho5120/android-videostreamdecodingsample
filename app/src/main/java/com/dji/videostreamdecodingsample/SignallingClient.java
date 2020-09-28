@@ -81,23 +81,21 @@ class SignallingClient {
 
             JSONObject datalogin = new JSONObject();
             try {
-                datalogin.put("login_key", "values");
-                datalogin.put("login_id", "values");
+                datalogin.put("login_key", Userdata.getInstance()._login_key);
+                datalogin.put("login_id", "don");
                 datalogin.put("status", "Y");
                 datalogin.put("type", "D");
                 datalogin.put("name", "드론");
                 datalogin.put("group_id", "b7172bde-297e-4a0e-8df9-9cd915a460b0");
-                datalogin.put("login_key", "values");
                 datalogin.put("group_name", "드론");
                 datalogin.put("'profile_photo'", "");
-                datalogin.put("room_key","" );
+                datalogin.put("room_key", Userdata.getInstance()._room_key );
                 socket.emit("reg_login_id",datalogin);
             }catch(JSONException e) {
                 e.printStackTrace();
             }
 
-
-            socket.emit("join_room","roomid","roomkey");
+            socket.emit("join_room",Userdata.getInstance()._room_id,Userdata.getInstance()._room_key);
 
             //room created event.
             socket.on("dron_created", args -> {
@@ -130,7 +128,7 @@ class SignallingClient {
             socket.on("bye", args -> callback.onRemoteHangUp((String) args[0]));
 
             //messages - SDP and ICE candidates are transferred through this
-            socket.on("message", args -> {
+            socket.on("signal", args -> {
                 Log.d("SignallingClient", "message call() called with: args = [" + Arrays.toString(args) + "]");
                 if (args[0] instanceof String) {
                     Log.d("SignallingClient", "String received :: " + args[0]);
@@ -177,7 +175,7 @@ class SignallingClient {
 
     public void emitMessage(String message) {
         Log.d("SignallingClient", "emitMessage() called with: message = [" + message + "]");
-        socket.emit("message", message);
+        socket.emit("signal", message);
     }
 
     public void Sendcandi(IceCandidate iceCandidate)
@@ -189,7 +187,7 @@ class SignallingClient {
             object.put("label", iceCandidate.sdpMLineIndex);
             object.put("id", iceCandidate.sdpMid);
             object.put("candidate", iceCandidate.sdp);
-            socket.emit("message", object);
+            socket.emit("signal", object);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -202,7 +200,7 @@ class SignallingClient {
             obj.put("type", message.type.canonicalForm());
             obj.put("sdp", message.description);
             Log.d("emitMessage", obj.toString());
-            socket.emit("message", obj);
+            socket.emit("signal", obj);
             Log.d("vivek1794", obj.toString());
         } catch (JSONException e) {
             e.printStackTrace();
@@ -216,7 +214,7 @@ class SignallingClient {
             object.put("label", iceCandidate.sdpMLineIndex);
             object.put("id", iceCandidate.sdpMid);
             object.put("candidate", iceCandidate.sdp);
-            socket.emit("message", object);
+            socket.emit("signal", object);
         } catch (Exception e) {
             e.printStackTrace();
         }

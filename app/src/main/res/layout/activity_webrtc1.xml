@@ -9,9 +9,6 @@
     tools:context=".MainActivity">
 
 
-
-
-
     <TextureView
         android:id="@+id/livestream_preview_ttv"
         android:layout_width="match_parent"
@@ -45,8 +42,6 @@
         android:layout_below="@id/main_title_rl"
         android:layout_marginTop="253dp" />
 
-
-
     <LinearLayout
         android:layout_width="150dp"
         android:layout_height="wrap_content"
@@ -62,7 +57,7 @@
             android:clickable="true"
             android:onClick="onClick"
             android:gravity="center"
-            android:visibility="gone"/>
+            android:visibility="visible"/>
 
         <Button
             android:id="@+id/activity_main_screen_surface_with_own_decoder"
@@ -72,7 +67,7 @@
             android:clickable="true"
             android:onClick="onClick"
             android:gravity="center"
-            android:visibility="gone"/>
+            android:visibility="visible"/>
 
         <Button
             android:id="@+id/activity_main_screen_surface"
@@ -81,7 +76,7 @@
             android:text="Demo SurfaceView"
             android:onClick="onClick"
             android:gravity="center"
-            android:visibility="gone"/>
+            android:visibility="visible"/>
 
 
         <Button

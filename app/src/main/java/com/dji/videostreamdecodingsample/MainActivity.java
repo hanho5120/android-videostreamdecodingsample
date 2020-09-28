@@ -2,7 +2,6 @@ package com.dji.videostreamdecodingsample;
 
 
 import android.Manifest;
-import android.accounts.NetworkErrorException;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
@@ -14,7 +13,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.os.NetworkOnMainThreadException;
 import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.Layout;
@@ -46,7 +44,6 @@ import androidx.core.content.ContextCompat;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.webrtc.SessionDescription;
 
 import dji.common.error.DJIError;
 import dji.common.error.DJISDKError;
@@ -66,12 +63,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
     private static final String LAST_USED_BRIDGE_IP = "bridgeip";
     private AtomicBoolean isRegistrationInProgress = new AtomicBoolean(false);
     private static boolean isAppStarted = false;
-    private BaseComponent.ComponentListener mDJIComponentListener = new BaseComponent.ComponentListener() {
 
-        @Override
-        public void onConnectivityChange(boolean isConnected) {
-        }
-    };
 
     //추가한 변수 리스트
     TextView stateText;
@@ -95,9 +87,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
     public static final int SEND_LOG = 0;
     public static final int SEND_VIS = 1;
 
-/*
-    private DJISDKManager.SDKManagerCallback registrationCallback = new DJISDKManager.SDKManagerCallback() {
 
+    private DJISDKManager.SDKManagerCallback registrationCallback = new DJISDKManager.SDKManagerCallback() {
 
         @Override
         public void onRegister(DJIError error) {
@@ -109,7 +100,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                 //Toast.makeText(getApplicationContext(), "SDK registration succeeded!", Toast.LENGTH_LONG).show();
                 bool_onRegister = true;
                 //LOG.append("SDK 등록 성공"+"\n");
-                //LOG.append("SDK 등록 성공, ");
+                LOG.append("SDK 등록 성공, ");
                 //bt_map_widget.setVisibility(View.VISIBLE);
             } else {
                 //Toast.makeText(getApplicationContext(),"SDK registration failed, check network and retry!",Toast.LENGTH_LONG).show();
@@ -118,7 +109,6 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                 LOG.append("SDK 등록 실패, ");
             }
         }
-
 
         @Override
         public void onProductDisconnect() {
@@ -159,10 +149,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
         public void onDatabaseDownloadProgress(long current, long total) {
 
         }
-
-
     };
-*/
 
     private void loginAccount() {
         UserAccountManager.getInstance().logIntoDJIUserAccount(this,
@@ -212,6 +199,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);  //화면 매칭 -> xml이랑 연결
         isAppStarted = true;
         findViewById(R.id.complete_ui_widgets).setOnClickListener(this);
@@ -244,6 +232,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
             }
         });
         findViewById(R.id.btn_map_widget).setOnClickListener(this);
+
+
         btn_map_widget.setOnClickListener(new View.OnClickListener(){
         //보내는것
             @Override
@@ -267,28 +257,12 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                 JsonObject temp = new JsonObject();
 
                 temp.addProperty("login_key", "24d2bd1d-5617-46cd-a49c-e1ecbb69fc4d");
-
                 NetworkTask networkTask = new NetworkTask("https://101.55.28.64:444/api/get-conference-list ", temp);
-
-                //임시
-                //Intent intent = new Intent(MainActivity.this, Webrtc1.class);
-                //startActivity(intent);
-                //
-
-
                 //LOG.append(Userdata.getInstance()._id.toString() +", "+Userdata.getInstance()._pw.toString()+", ");
-
                 if(Userdata.getInstance()._id.equals("") || Userdata.getInstance()._pw.equals(""))
                     LOG.append("ID 또는 PW를 확인해주세요, ");
-                else {
-                    try  {
-                        networkTask.execute();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                }
-
+                else
+                    networkTask.execute();
 
                 //edit_idText에 들어왔는지 찍어봐
                 //Toast.makeText(getApplicationContext(), Userdata.getInstance()._profile_photo.toString(), Toast.LENGTH_LONG).show();
@@ -353,7 +327,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                 }
             }
         });
-        //checkAndRequestPermissions();
+        checkAndRequestPermissions();
     }
 
 
@@ -422,12 +396,15 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                     stateText.setText(msg.obj.toString());
                     break;
                 case SEND_VIS:
-                    //if(bool_onRegister && bool_onProductConnect) {
-                    //디버그용
-                    if(bool_onRegister) {
+                    if(bool_onRegister && bool_onProductConnect) {
+
+                        Intent intent = new Intent(MainActivity.this, Webrtc1.class);
+                        startActivity(intent);
+
+                    //if(bool_onRegister) {
                         //btn_map_widget.setVisibility(View.VISIBLE);
-                        view_userInfo.setVisibility(View.VISIBLE);
-                        view_droneimg.setVisibility(View.VISIBLE);
+                        //view_userInfo.setVisibility(View.VISIBLE);
+                        //view_droneimg.setVisibility(View.VISIBLE);
                     }
                     else{
                         view_userInfo.setVisibility(View.INVISIBLE);
@@ -451,14 +428,6 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
             super.run();
             while (true) {
                 //조건 추가해서 덜 돌게하기
-
-
-
-                //나중에 꼽아도되게
-                //checkAndRequestPermissions();
-                startSDKRegistration();
-                //DJISDKManager.SDKManagerCallback.
-
                 //버튼 보이게 하기
                 Message message_vis = handler.obtainMessage();
                 message_vis.what = SEND_VIS;
@@ -560,84 +529,17 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
             LOG.append("SDK와 드론이 연결되지 않음, ");
         }
     }
-/*
+
     private void startSDKRegistration() {
         if (isRegistrationInProgress.compareAndSet(false, true)) {
             AsyncTask.execute(new Runnable() {
                 @Override
                 public void run() {
                     DJISDKManager.getInstance().registerApp(MainActivity.this, registrationCallback);
-
-
                 }
             });
         }
     }
-*/
-
-    private void startSDKRegistration() {
-        if (isRegistrationInProgress.compareAndSet(false, true)) {
-            AsyncTask.execute(new Runnable() {
-                @Override
-                public void run() {
-                    DJISDKManager.getInstance().registerApp(MainActivity.this.getApplicationContext(), new DJISDKManager.SDKManagerCallback() {
-                        @Override
-                        public void onRegister(DJIError djiError) {
-                            if (djiError == DJISDKError.REGISTRATION_SUCCESS) {
-                                DJILog.e("App registration", DJISDKError.REGISTRATION_SUCCESS.getDescription());
-                                DJISDKManager.getInstance().startConnectionToProduct();
-                                bool_onRegister = true;
-                                LOG.append("sdk, ");
-                            } else {
-                            }
-
-                        }
-                        @Override
-                        public void onProductDisconnect() {
-                            LOG.append("제품 해제, ");
-
-                        }
-                        @Override
-                        public void onProductConnect(BaseProduct baseProduct) {
-                            bool_onProductConnect = true;
-                            LOG.append("제품 연결 됨, ");
-                        }
-
-                        @Override
-                        public void onProductChanged(BaseProduct baseProduct) {
-                            LOG.append("제품재연결, ");
-
-                        }
-
-                        @Override
-                        public void onComponentChange(BaseProduct.ComponentKey componentKey,
-                                                      BaseComponent oldComponent,
-                                                      BaseComponent newComponent) {
-                            if (newComponent != null) {
-                                newComponent.setComponentListener(mDJIComponentListener);
-                            }
-
-                        }
-
-                        @Override
-                        public void onInitProcess(DJISDKInitEvent djisdkInitEvent, int i) {
-
-                        }
-
-                        @Override
-                        public void onDatabaseDownloadProgress(long l, long l1) {
-
-                        }
-
-
-                    });
-                }
-            });
-        }
-    }
-
-
-
 
     @Override
     public void onClick(View view) {

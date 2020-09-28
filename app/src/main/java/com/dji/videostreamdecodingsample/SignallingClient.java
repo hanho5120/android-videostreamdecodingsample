@@ -98,14 +98,14 @@ class SignallingClient {
             socket.emit("join_room",Userdata.getInstance()._room_id,Userdata.getInstance()._room_key);
 
             //room created event.
-            socket.on("dron_created", args -> {
+            socket.on("user_created", args -> {
                 Log.d("SignallingClient", "created call() called with: args = [" + Arrays.toString(args) + "]");
                 isInitiator = true;
                 callback.onCreatedRoom();
             });
 
             //room is full event
-            socket.on("dron_full", args -> Log.d("SignallingClient", "full call() called with: args = [" + Arrays.toString(args) + "]"));
+            socket.on("user_full", args -> Log.d("SignallingClient", "full call() called with: args = [" + Arrays.toString(args) + "]"));
 
             //peer joined event
             socket.on("join", args -> {
@@ -115,7 +115,7 @@ class SignallingClient {
             });
 
             //when you joined a chat room successfully
-            socket.on("dron_joined", args -> {
+            socket.on("user_joined", args -> {
                 Log.d("SignallingClient", "joined call() called with: args = [" + Arrays.toString(args) + "]");
                 isChannelReady = true;
                 callback.onJoinedRoom();

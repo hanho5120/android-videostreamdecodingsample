@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.SystemClock;
@@ -51,6 +52,8 @@ import org.webrtc.VideoCapturer;
 import org.webrtc.VideoFrame;
 import org.webrtc.VideoSource;
 import org.webrtc.VideoTrack;
+import org.webrtc.audio.AudioDeviceModule;
+import org.webrtc.audio.JavaAudioDeviceModule;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -74,6 +77,7 @@ import com.dji.videostreamdecodingsample.media.DJIVideoStreamDecoder;
 import com.dji.videostreamdecodingsample.media.NativeHelper;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -92,6 +96,8 @@ import io.socket.client.Socket;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -101,13 +107,12 @@ import retrofit2.Response;
 
 
 
-
-
-public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback, SignallingClient.SignalingInterface {
+public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback, SignallingClient.SignalingInterface, RemoteSocketInterface.SocketListner {
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int MSG_WHAT_SHOW_TOAST = 0;
     private static final int MSG_WHAT_UPDATE_TITLE = 1;
     private SurfaceHolder.Callback surfaceCallback;
+
     private enum DemoType { USE_TEXTURE_VIEW, USE_SURFACE_VIEW, USE_SURFACE_VIEW_DEMO_DECODER}
     private static DemoType demoType = DemoType.USE_SURFACE_VIEW;
     private VideoFeeder.VideoFeed standardVideoFeeder;
@@ -146,8 +151,7 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
     private int count;
     private  Socket socket;
 
-
-    ////////// ==== webrtc =====
+     ////////// ==== webrtc =====
 
     PeerConnectionFactory peerConnectionFactory;
     MediaConstraints audioConstraints;
@@ -167,11 +171,389 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
     List<IceServer> iceServers;
     EglBase rootEglBase;
 
+    List<PeerConnection> Localpeerlist;
+
     boolean gotUserMedia;
     List<PeerConnection.IceServer> peerIceServers = new ArrayList<>();
 
     final int ALL_PERMISSIONS_CODE = 1;
     VideoCapturer videoCapturerAndroid;
+
+    //========================================================= new webrtc ========================================================
+    public int mWidth = 854;
+    public int mHeight = 480;
+    public int mFps = 30;
+    public int mVideoBitrate = 5000;
+    public int mAudioBitrate = 32;
+    public int x_google_start_bitrate = 1000;
+    public int x_google_min_bitrate = 1000;
+    public int x_google_max_bitrate = 5000;
+    public int x_google_max_quantization = 56;
+    public PeerConnectionFactory mPeerConnectionFactory;
+    public MediaConstraints mPeerConnConstraints;
+    public MediaConstraints mAudioConstraints;
+    public AudioTrack mLocalAudioTrack;
+    public VideoTrack mLocalVideoTrack;
+    public SurfaceTextureHelper mSurfaceTextureHelper;
+    public VideoSource mVideoSource;
+    public AudioSource mAudioSource;
+    public List<PeerConnection.IceServer> mPeerIceServers = new ArrayList<>();
+    public ArrayList<RemoteDTO> mRemoteUsers = new ArrayList<>();
+    public AudioDeviceModule mAudioAdm;
+    protected long myBaseTime;
+    protected String easy_outTime;
+    protected int mDeviceWidth;
+    protected int mDeviceHeight;
+    public EglBase mEglBase;
+    public VideoCapturer mVideoCapturer;
+
+
+    public void webRtcInit() {
+
+        // keep screen on
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        initViews();
+        initVideos();
+
+        // Ice Server
+        getIceServers();
+
+        // initPeerConnectionFactoryOptions
+        PeerConnectionFactory.initialize(initPeerConnectionFactoryOptions());
+
+        // AudioModule
+        mAudioAdm = createJavaAudioDevice();
+
+        // PeerConnectionFactory option
+        PeerConnectionFactory.Options peerConnctionFactoryOption = new PeerConnectionFactory.Options();
+        peerConnctionFactoryOption.networkIgnoreMask = 0;
+
+        mPeerConnectionFactory = PeerConnectionFactory.builder()
+                .setOptions(peerConnctionFactoryOption)
+                .setAudioDeviceModule(mAudioAdm)
+                .setVideoEncoderFactory(new DefaultVideoEncoderFactory(mEglBase.getEglBaseContext(), true, false))
+                .setVideoDecoderFactory(new DefaultVideoDecoderFactory(mEglBase.getEglBaseContext()))
+                .createPeerConnectionFactory();
+
+        // AudioModule Release
+        mAudioAdm.release();
+
+        // PeerConnConstraints
+        mPeerConnConstraints = new MediaConstraints();
+        mPeerConnConstraints.optional.add(new MediaConstraints.KeyValuePair("DtlsSrtpKeyAgreement", "true"));
+        mPeerConnConstraints.mandatory.add(new MediaConstraints.KeyValuePair("IceRestart", "true"));
+        mPeerConnConstraints.mandatory.add(new MediaConstraints.KeyValuePair("offerToReceiveAudio", "true"));
+        mPeerConnConstraints.mandatory.add(new MediaConstraints.KeyValuePair("offerToReceiveVideo", "true"));
+
+        // AudioConstraints
+        mAudioConstraints = new MediaConstraints();
+        mAudioConstraints.mandatory.add(new MediaConstraints.KeyValuePair("googNoiseSuppression", "true"));
+        mAudioConstraints.mandatory.add(new MediaConstraints.KeyValuePair("googEchoCancellation", "true"));
+        mAudioConstraints.mandatory.add(new MediaConstraints.KeyValuePair("echoCancellation", "true"));
+        mAudioConstraints.mandatory.add(new MediaConstraints.KeyValuePair("noiseSuppression", "true"));
+
+        // Video
+        //mVideoCapturer = createCameraCapturer(new Camera1Enumerator(false));
+
+        mVideoCapturer = new VideoCapturer() {
+            @Override
+            public void initialize(SurfaceTextureHelper surfaceTextureHelper, Context context, CapturerObserver capturerObserver) {
+
+            }
+
+            @Override
+            public void startCapture(int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void stopCapture() throws InterruptedException {
+
+            }
+
+            @Override
+            public void changeCaptureFormat(int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void dispose() {
+
+            }
+
+            @Override
+            public boolean isScreencast() {
+                return false;
+            }
+        };
+
+        mSurfaceTextureHelper = SurfaceTextureHelper.create(Thread.currentThread().getName(), mEglBase.getEglBaseContext());
+        mVideoSource = mPeerConnectionFactory.createVideoSource(mVideoCapturer.isScreencast());
+        mVideoSource.adaptOutputFormat(mWidth, mHeight, mFps);
+
+        mVideoCapturer.initialize(mSurfaceTextureHelper, getApplicationContext(), mVideoSource.getCapturerObserver());
+        mVideoCapturer.startCapture(mWidth, mHeight, mFps);
+
+        // Audio
+        mAudioSource = mPeerConnectionFactory.createAudioSource(mAudioConstraints);
+
+        // Track
+        mLocalAudioTrack = mPeerConnectionFactory.createAudioTrack("101", mAudioSource);
+        mLocalVideoTrack = mPeerConnectionFactory.createVideoTrack("100", mVideoSource);
+    }
+
+    @Override
+    public void onConnect() {
+        try {
+            JSONObject datalogin = new JSONObject();
+            try {
+                datalogin.put("login_key", Userdata.getInstance()._login_key);
+                datalogin.put("login_id", "don");
+                datalogin.put("status", "Y");
+                datalogin.put("type", "D");
+                datalogin.put("name", "드론");
+                datalogin.put("group_id", "b7172bde-297e-4a0e-8df9-9cd915a460b0");
+                datalogin.put("group_name", "드론");
+                datalogin.put("'profile_photo'", "");
+                datalogin.put("room_key", Userdata.getInstance()._room_key );
+            }catch(JSONException e) {
+                e.printStackTrace();
+            }
+
+            RemoteSocketClient.getInstance().getSocket().emit("reg_login_id", datalogin);
+            RemoteSocketClient.getInstance().getSocket().emit("join_room", Userdata.getInstance()._room_id,Userdata.getInstance()._room_key);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onConnectError(String psMsg) {
+
+    }
+
+    @Override
+    public void onDisConnect(String psMsg) {
+
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @Override
+    public void user_joined(String psId, int piCount, ArrayList<String> poClients) {
+        for (String clientSocketId : poClients) {
+            // 내영상은 Array 에 담을 필요가 없음
+            if (clientSocketId.equals(RemoteSocketClient.getInstance().getSocketId())) {
+                continue;
+            }
+
+            if (getRemoteUserIndex(clientSocketId) > -1) {
+                continue;
+            }
+
+            RemoteDTO remoteDTO = new RemoteDTO();
+            remoteDTO.setSocketId(clientSocketId);
+
+
+            remoteDTO.createPeerConnection(mPeerConnectionFactory, mPeerIceServers, mPeerConnConstraints, new RemoteSocketInterface.PeerCreateLister() {
+                @Override
+                public void onIceCandidate(IceCandidate poIceCandidate, String psSocketId) {
+                    if (poIceCandidate != null) {
+
+                        try {
+                            JSONObject jsonObject = new JSONObject();
+                            jsonObject.put("type", "candidate");
+                            jsonObject.put("sdpMLineIndex", poIceCandidate.sdpMLineIndex);
+                            jsonObject.put("sdpMid", poIceCandidate.sdpMid);
+                            jsonObject.put("candidate", poIceCandidate.sdp);
+
+                            JSONObject jsonObject_content = new JSONObject();
+                            jsonObject_content.put("ice", jsonObject);
+
+                            RemoteSocketClient.getInstance().getSocket().emit("signal", psSocketId, jsonObject_content.toString());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+                @Override
+                public void onAddStream(MediaStream mediaStream, String socketId) {
+
+                }
+            });
+
+            remoteDTO.addSteam(mPeerConnectionFactory, mLocalAudioTrack, mLocalVideoTrack);
+            mRemoteUsers.add(remoteDTO);
+        }
+
+        // 내 소켓에 createoffer 필요 없음
+        if (psId.equals(RemoteSocketClient.getInstance().getSocketId())) {
+            return;
+        }
+
+        if (piCount >= 2) {
+            if (psId.equals(RemoteSocketClient.getInstance().getSocketId())) {
+                return;
+            }
+
+            int index = getRemoteUserIndex(psId);
+
+            if (index == -1) {
+                return;
+            }
+
+            mRemoteUsers.get(index).createOffer(mPeerConnConstraints, sessionDescription -> {
+                try {
+                    JSONObject jsonObject = new JSONObject();
+
+                    String ls_sdp = changeSdp(changeSdp(sessionDescription.description, "video", mVideoBitrate), "audio", mAudioBitrate);
+                    ls_sdp = changeBitrate(ls_sdp);
+
+                    jsonObject.put("sdp", ls_sdp);
+                    jsonObject.put("type", sessionDescription.type.canonicalForm());
+
+                    JSONObject jsonObject_content = new JSONObject();
+                    jsonObject_content.put("sdp", jsonObject);
+
+                    RemoteSocketClient.getInstance().getSocket().emit("signal", psId, jsonObject_content.toString());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+    }
+
+    @Override
+    public void user_left(String psId) {
+        int index = getRemoteUserIndex(psId);
+
+        if (index < 0) {
+            return;
+        }
+
+        mRemoteUsers.get(index).remove(mLocalAudioTrack, mLocalVideoTrack, () -> {
+            mRemoteUsers.remove(index);
+        });
+
+    }
+
+    @Override
+    public void gotMessageFromServer(String psId, JSONObject signal) {
+        int index = getRemoteUserIndex(psId);
+
+        if (index == -1) {
+            return;
+        }
+
+        RemoteDTO data = mRemoteUsers.get(index);
+
+        if (!data.getSocketId().equals(RemoteSocketClient.getInstance().getSocketId())) {
+            try {
+                if (signal.has("sdp")) {
+                    JSONObject content_data = new JSONObject(signal.getString("sdp"));
+                    String ls_type = content_data.getString("type");
+
+                    data.getPeerConnection().setRemoteDescription(new CustomSdpObserver("localSetRemote"), new SessionDescription((ls_type.equals("answer") ? SessionDescription.Type.ANSWER : SessionDescription.Type.OFFER), content_data.getString("sdp")));
+
+                    if (ls_type.equals("offer")) {
+                        data.getPeerConnection().createAnswer(new CustomSdpObserver("localCreateAns") {
+                            @RequiresApi(api = Build.VERSION_CODES.O)
+                            @Override
+                            public void onCreateSuccess(SessionDescription sessionDescription) {
+                                super.onCreateSuccess(sessionDescription);
+
+                                try {
+                                    data.getPeerConnection().setLocalDescription(new CustomSdpObserver("localSetLocal"), sessionDescription);
+
+                                    JSONObject jsonObject = new JSONObject();
+
+                                    String ls_sdp = changeSdp(changeSdp(sessionDescription.description, "video", mVideoBitrate), "audio", mAudioBitrate);
+                                    ls_sdp = changeBitrate(ls_sdp);
+
+                                    jsonObject.put("sdp", ls_sdp);
+                                    jsonObject.put("type", sessionDescription.type.canonicalForm());
+
+                                    JSONObject jsonObject_content = new JSONObject();
+                                    jsonObject_content.put("sdp", jsonObject);
+
+                                    RemoteSocketClient.getInstance().getSocket().emit("signal", data.getSocketId(), jsonObject_content.toString());
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            @Override
+                            public void onCreateFailure(String s) {
+                                super.onCreateFailure(s);
+                            }
+                        }, mPeerConnConstraints);
+                    }
+                }
+
+                if (signal.has("ice")) {
+                    JSONObject content_data = new JSONObject(signal.getString("ice"));
+                    data.getPeerConnection().addIceCandidate(new IceCandidate(content_data.getString("sdpMid"), content_data.getInt("sdpMLineIndex"), content_data.getString("candidate")));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void goChatMsg(JSONObject poData) {
+
+    }
+
+
+    @Override
+    public void onClosed() {
+
+    }
+
+    @Override
+    public void onReloaded() {
+
+    }
+
+    @Override
+    public void goZoom(String psMsg) {
+
+    }
+
+    @Override
+    public void goFlash(String psMsg) {
+
+    }
+
+    @Override
+    public void goDraw(JSONObject data) {
+
+    }
+
+    @Override
+    public void goMark(JSONObject data) {
+
+    }
+
+    @Override
+    public void goScreen(String psMsg) {
+
+    }
+
+    @Override
+    public void onZoomChanged(int level) {
+
+    }
+
+    @Override
+    public void onFlashChanged() {
+
+    }
+
+
+    //==============================================================================================================================
 
 
     void Changeframe(byte[] videoBuffer, int size, int width, int height)
@@ -301,7 +683,26 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
 
     }
 
-    public void start() {
+
+    public void start()
+    {
+        initViews();
+        initVideos();
+        getIceServers();
+        webRtcInit();
+        RemoteSocketClient.getInstance().init(this);
+
+        localVideoView.setVisibility(View.VISIBLE);
+        mLocalVideoTrack.addSink(localVideoView);
+
+        localVideoView.setMirror(false);
+        remoteVideoView.setMirror(false);
+
+    }
+
+    public void start_old() {
+
+
 
         if (localPeer != null) {
             localPeer.close();
@@ -316,7 +717,8 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
         initVideos();
         getIceServers();
 
-        SignallingClient.getInstance().init(this);
+        //SignallingClient.getInstance().init(this);
+        RemoteSocketClient.getInstance().init(this);
 
         //Initialize PeerConnectionFactory globals.
         PeerConnectionFactory.InitializationOptions initializationOptions =
@@ -371,13 +773,19 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
         };
 
 
-        //videoCapturerAndroid = createCameraCapturer(new Camera1Enumerator(false));
-
-        //Create MediaConstraints - Will be useful for specifying video and audio constraints.
-        audioConstraints = new MediaConstraints();
+        // PeerConnConstraints
         videoConstraints = new MediaConstraints();
-        audioConstraints.mandatory.add(new MediaConstraints.KeyValuePair("offerToReceiveAudio","true"));
-        videoConstraints.mandatory.add(new MediaConstraints.KeyValuePair("offerToReceiveVideo","true"));
+        videoConstraints.optional.add(new MediaConstraints.KeyValuePair("DtlsSrtpKeyAgreement", "true"));
+        videoConstraints.mandatory.add(new MediaConstraints.KeyValuePair("IceRestart", "true"));
+        videoConstraints.mandatory.add(new MediaConstraints.KeyValuePair("offerToReceiveAudio", "true"));
+        videoConstraints.mandatory.add(new MediaConstraints.KeyValuePair("offerToReceiveVideo", "true"));
+
+        // AudioConstraints
+        audioConstraints = new MediaConstraints();
+        audioConstraints.mandatory.add(new MediaConstraints.KeyValuePair("googNoiseSuppression", "true"));
+        audioConstraints.mandatory.add(new MediaConstraints.KeyValuePair("googEchoCancellation", "true"));
+        audioConstraints.mandatory.add(new MediaConstraints.KeyValuePair("echoCancellation", "true"));
+        audioConstraints.mandatory.add(new MediaConstraints.KeyValuePair("noiseSuppression", "true"));
 
         //Create a VideoSource instance
         if (videoCapturerAndroid != null) {
@@ -392,10 +800,8 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
         localAudioTrack = peerConnectionFactory.createAudioTrack("101", audioSource);
 
         if (videoCapturerAndroid != null) {
-            videoCapturerAndroid.startCapture(1024, 720, 30);
+            videoCapturerAndroid.startCapture(mWidth, mHeight, mFps);
         }
-
-
 
         localVideoView.setVisibility(View.VISIBLE);
         // And finally, with our VideoRenderer ready, we
@@ -408,13 +814,175 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
         gotUserMedia = true;
 
 
+
         if (SignallingClient.getInstance().isInitiator) {
             onTryToStart();
         }
 
 
-
     }
+
+
+    public String changeBitrate(String psSdp) {
+        String lsSdp = psSdp;
+
+        String[] lines = lsSdp.split("\r\n");
+        int lineIndex = -1;
+        String vp8RtpMap = null;
+        Pattern vp8Pattern = Pattern.compile("^a=rtpmap:(\\d+) VP8/90000[\r]?$");
+
+        for (int i = 0; i < lines.length; i++) {
+            Matcher vp8Matcher = vp8Pattern.matcher(lines[i]);
+            if (vp8Matcher.matches()) {
+                vp8RtpMap = vp8Matcher.group(1);
+                lineIndex = i;
+                break;
+            }
+        }
+
+        if (vp8RtpMap == null) {
+            return lsSdp;
+        }
+
+        StringBuilder newSdpDescription = new StringBuilder();
+
+        for (int i = 0; i < lines.length; i++) {
+            newSdpDescription.append(lines[i]).append("\r\n");
+
+            if (i == lineIndex) {
+                String bitrateSet = "a=fmtp:" + vp8RtpMap + " x-google-start-bitrate="+x_google_start_bitrate+"; x-google-min-bitrate="+x_google_min_bitrate+"; x-google-max-bitrate="+x_google_max_bitrate+"; x-google-max-quantization="+x_google_max_quantization;
+                newSdpDescription.append(bitrateSet).append("\r\n");
+            }
+        }
+
+        return newSdpDescription.toString();
+    }
+
+    /**
+     * sdp 변경
+     * @return
+     */
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public String changeSdp(String psSdp, String psMediaType, int piBitrate) {
+        String lsSdp = psSdp;
+        String[] lsSdps = lsSdp.split("\n");
+
+        ArrayList<String> strs = new ArrayList<String>(Arrays.asList(lsSdps));
+
+        int li_line = -1;
+
+        for ( int i = 0; i < strs.size(); i++ ) {
+            if ( strs.get(i).indexOf("m="+psMediaType) == 0 ) {
+                li_line = i;
+                break;
+            }
+        }
+
+        if ( li_line == -1 ) {
+            return lsSdp;
+        }
+
+        li_line++;
+
+        while ( strs.get(li_line).indexOf("i=") == 0 || strs.get(li_line).indexOf("c=") == 0 ) {
+            li_line++;
+        }
+
+        if ( strs.get(li_line).indexOf("b") == 0 ) {
+            strs.set(li_line, "b=AS:"+piBitrate);
+            lsSdp = String.join("\n", strs);
+            return lsSdp;
+        }
+
+        List<String> newStrs = strs.subList(0, li_line);
+        newStrs.add("b=AS:"+piBitrate);
+        newStrs.addAll(strs.subList(li_line+1, strs.size()));
+
+        lsSdp = String.join("\n", newStrs) + "\n";
+
+        return lsSdp;
+    }
+
+    /**
+     * 피어소켓 인덱스 구하기
+     */
+    public int getRemoteUserIndex(String psSocketId) {
+        if ( mRemoteUsers.size() < 1 ) {
+            return -1;
+        }
+
+        int li_index = -1;
+
+        for ( int i = 0; i < mRemoteUsers.size(); i++ ) {
+            RemoteDTO lo_data = mRemoteUsers.get(i);
+
+            if ( lo_data.getSocketId().equals(psSocketId) ) {
+                li_index = i;
+                break;
+            }
+        }
+
+        return li_index;
+    }
+
+
+
+    /**
+
+
+
+    /**
+     * PeerConnectionFactory.InitializationOptions
+     */
+    public PeerConnectionFactory.InitializationOptions initPeerConnectionFactoryOptions() {
+        return PeerConnectionFactory.InitializationOptions
+                .builder(getApplicationContext())
+                .setEnableInternalTracer(false) // 추가한거
+                .createInitializationOptions();
+    }
+
+    /**
+     * Audio Module
+     */
+    public AudioDeviceModule createJavaAudioDevice() {
+        JavaAudioDeviceModule.AudioRecordErrorCallback audioRecordErrorCallback = new JavaAudioDeviceModule.AudioRecordErrorCallback() {
+            @Override
+            public void onWebRtcAudioRecordInitError(String errorMessage) {
+            }
+
+            @Override
+            public void onWebRtcAudioRecordStartError(JavaAudioDeviceModule.AudioRecordStartErrorCode errorCode, String errorMessage) {
+            }
+
+            @Override
+            public void onWebRtcAudioRecordError(String errorMessage) {
+            }
+        };
+
+        JavaAudioDeviceModule.AudioTrackErrorCallback audioTrackErrorCallback = new JavaAudioDeviceModule.AudioTrackErrorCallback() {
+            @Override
+            public void onWebRtcAudioTrackInitError(String errorMessage) {
+            }
+
+            @Override
+            public void onWebRtcAudioTrackStartError(JavaAudioDeviceModule.AudioTrackStartErrorCode errorCode, String errorMessage) {
+            }
+
+            @Override
+            public void onWebRtcAudioTrackError(String errorMessage) {
+            }
+        };
+
+        return JavaAudioDeviceModule.builder(this)
+                .setSamplesReadyCallback(null)
+                .setUseHardwareAcousticEchoCanceler(true)
+                .setUseHardwareNoiseSuppressor(true)
+                .setAudioRecordErrorCallback(audioRecordErrorCallback)
+                .setAudioTrackErrorCallback(audioTrackErrorCallback)
+                .createAudioDeviceModule();
+    }
+
+
 
     /**
      * This method will be called directly by the app when it is the initiator and has got the local media
@@ -448,7 +1016,11 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
         rtcConfig.iceTransportsType = PeerConnection.IceTransportsType.RELAY;
         // Use ECDSA encryption.
         rtcConfig.keyType = PeerConnection.KeyType.ECDSA;
-        localPeer = peerConnectionFactory.createPeerConnection(rtcConfig, new CustomPeerConnectionObserver("localPeerCreation") {
+
+        RemoteDTO remoteDTO = new RemoteDTO();
+
+
+        localPeer= peerConnectionFactory.createPeerConnection(rtcConfig, new CustomPeerConnectionObserver("localPeerCreation") {
             @Override
             public void onIceCandidate(IceCandidate iceCandidate) {
                 super.onIceCandidate(iceCandidate);
@@ -463,6 +1035,7 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
             }
         });
 
+
         addStreamToLocalPeer();
     }
 
@@ -474,7 +1047,7 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
         MediaStream stream = peerConnectionFactory.createLocalMediaStream("102");
         stream.addTrack(localAudioTrack);
         stream.addTrack(localVideoTrack);
-        localPeer.addStream(stream);
+        Localpeerlist.get(Localpeerlist.size()).addStream(stream);
     }
 
     /**
@@ -542,6 +1115,8 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
         if (gotUserMedia) {
             SignallingClient.getInstance().emitMessage("got user media");
         }
+
+
     }
 
     @Override
@@ -911,8 +1486,6 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
                     }
                 });
 
-                //When calibration is needed or the fetch key frame is required by SDK, should use the provideTranscodedVideoFeed
-                //to receive the transcoded video feed from main camera.
                 if (demoType == DemoType.USE_SURFACE_VIEW_DEMO_DECODER && isTranscodedVideoFeedNeeded()) {
                     standardVideoFeeder = VideoFeeder.getInstance().provideTranscodedVideoFeed();
                     standardVideoFeeder.addVideoDataListener(mReceivedVideoDataListener);

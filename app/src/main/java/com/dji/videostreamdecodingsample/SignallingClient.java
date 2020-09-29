@@ -90,6 +90,7 @@ class SignallingClient {
                 datalogin.put("group_name", "드론");
                 datalogin.put("'profile_photo'", "");
                 datalogin.put("room_key", Userdata.getInstance()._room_key );
+
                 socket.emit("reg_login_id",datalogin);
             }catch(JSONException e) {
                 e.printStackTrace();
@@ -115,7 +116,7 @@ class SignallingClient {
             });
 
             //when you joined a chat room successfully
-            socket.on("user_joined", args -> {
+            socket.on("user-joined", args -> {
                 Log.d("SignallingClient", "joined call() called with: args = [" + Arrays.toString(args) + "]");
                 isChannelReady = true;
                 callback.onJoinedRoom();
@@ -177,20 +178,6 @@ class SignallingClient {
         socket.emit("signal", message);
     }
 
-    public void Sendcandi(IceCandidate iceCandidate)
-    {
-
-        try {
-            JSONObject object = new JSONObject();
-            object.put("type", "candidate");
-            object.put("label", iceCandidate.sdpMLineIndex);
-            object.put("id", iceCandidate.sdpMid);
-            object.put("candidate", iceCandidate.sdp);
-            socket.emit("signal", object);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     public void emitMessage(SessionDescription message) {
         try {
@@ -218,7 +205,7 @@ class SignallingClient {
             e.printStackTrace();
         }
     }
-    
+
     public void close() {
         if(socket==null) return;
         socket.emit("bye", "12345");

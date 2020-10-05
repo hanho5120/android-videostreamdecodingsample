@@ -49,6 +49,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import dji.common.error.DJIError;
+import dji.common.error.DJIRemoteControllerError;
 import dji.common.error.DJISDKError;
 import dji.common.useraccount.UserAccountState;
 import dji.common.util.CommonCallbacks;
@@ -59,6 +60,7 @@ import dji.sdk.flighthub.model.User;
 import dji.sdk.sdkmanager.DJISDKInitEvent;
 import dji.sdk.sdkmanager.DJISDKManager;
 import dji.sdk.useraccount.UserAccountManager;
+import dji.sdksharedlib.DJISDKCache;
 
 /** Main activity that displays three choices to user */
 public class MainActivity extends Activity implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
@@ -73,12 +75,13 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
     Handler mHandler = null;
     Thread mThread = null;
     Button btn_map_widget;
+    Button btn_check;
     TextView edit_idText;
     TextView edit_pwText;
     View view_userInfo;
     View view_droneimg;
     View view_background;
-    Button btn_exit;
+    boolean checkUsbConnection;
 
 
     //값 체크 부분 리스트
@@ -118,6 +121,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
             //Toast.makeText(getApplicationContext(),"product disconnect!",Toast.LENGTH_LONG).show();
             //LOG.append("제품 연결 안 됨"+"\n");
             bool_onProductConnect = false;
+            checkUsbConnection = isConnected();
             LOG.append("제품 연결 안 됨, ");
         }
 
@@ -131,7 +135,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
 
         @Override
         public void onProductChanged(BaseProduct product) {
-
+            LOG.append("onProductChanged, ");
         }
 
         @Override
@@ -145,12 +149,11 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
 
         @Override
         public void onInitProcess(DJISDKInitEvent event, int totalProcess) {
-
         }
 
         @Override
         public void onDatabaseDownloadProgress(long current, long total) {
-
+            LOG.append("onDatabaseDownloadProgress, ");
         }
     };
 
@@ -186,6 +189,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
             Manifest.permission.ACCESS_NETWORK_STATE, // WIFI connected products
             Manifest.permission.ACCESS_FINE_LOCATION, // Maps
             Manifest.permission.CHANGE_WIFI_STATE, // Changing between WIFI and USB connection
+
             Manifest.permission.WRITE_EXTERNAL_STORAGE, // Log files
             Manifest.permission.BLUETOOTH, // Bluetooth connected products
             Manifest.permission.BLUETOOTH_ADMIN, // Bluetooth connected products
@@ -198,11 +202,19 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
     private List<String> missingPermission = new ArrayList<>();
     private EditText bridgeModeEditText;
 
-
+    /*
+    @Override
+    protected void onStart() {
+        super.onStart();
+        //checkAndRequestPermissions();//??
+        startSDKRegistration();
+    }
+    */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        checkUsbConnection = isConnected();
         setContentView(R.layout.activity_main);  //화면 매칭 -> xml이랑 연결
         isAppStarted = true;
         findViewById(R.id.complete_ui_widgets).setOnClickListener(this);
@@ -210,6 +222,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
 
         //추가 부분--------------
         btn_map_widget = (Button) findViewById(R.id.btn_map_widget);
+        btn_check = (Button) findViewById(R.id.btn_check);
 
         //로그인정보
 
@@ -225,15 +238,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
         });
         edit_idText = (TextView) findViewById(R.id.edit_idText);
         edit_pwText = (TextView) findViewById(R.id.edit_pwText);
-        btn_exit = (Button) findViewById(R.id.btn_exit);
-        btn_exit.setOnClickListener(new View.OnClickListener(){
 
-            @Override
-            public void onClick(View v) {
-                //view_userInfo.setVisibility(View.INVISIBLE);
-                //bool_onRegister = false;
-            }
-        });
         findViewById(R.id.btn_map_widget).setOnClickListener(this);
 
 
@@ -262,8 +267,10 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                 temp.addProperty("login_key", "24d2bd1d-5617-46cd-a49c-e1ecbb69fc4d");
                 NetworkTask networkTask = new NetworkTask("https://101.55.28.64:444/api/get-conference-list ", temp);
                 //LOG.append(Userdata.getInstance()._id.toString() +", "+Userdata.getInstance()._pw.toString()+", ");
-                if(Userdata.getInstance()._id.equals("") || Userdata.getInstance()._pw.equals(""))
+                if(Userdata.getInstance()._id.equals("") || Userdata.getInstance()._pw.equals("")) {
                     LOG.append("ID 또는 PW를 확인해주세요, ");
+                    Toast.makeText(getApplicationContext(), "ID 또는 PW를 확인해주세요", Toast.LENGTH_LONG).show();
+                }
                 else
                     networkTask.execute();
 
@@ -275,6 +282,19 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
             }
         });
 
+        findViewById(R.id.btn_check).setOnClickListener(this);
+
+        btn_check.setOnClickListener(new View.OnClickListener(){
+            //보내는것
+            @Override
+            public void onClick(View v) {
+                DJISDKManager.getInstance().destroy();
+                startSDKRegistration();
+
+                LOG.append("버튼 누름");
+                //usb
+            }
+        });
 
 
 
@@ -287,6 +307,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
         mThread.setDaemon(true);
         mThread.start();
         mHandler = new Handler();
+
+
         //------------------------------
 
         bridgeModeEditText = (EditText) findViewById(R.id.edittext_bridge_ip);
@@ -350,6 +372,12 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                 }
             };
 
+
+    public boolean isConnected() {
+        Intent intent = registerReceiver(null, new IntentFilter("android.hardware.usb.action.USB_STATE"));
+        //Intent intent = registerReceiver(null, new IntentFilter("android.hardware.usb.action.USB_STATE"));
+        return intent.getExtras().getBoolean("connected");
+    }
 
     public class  NetworkTask extends AsyncTask<Void, Void, String>{
 
@@ -417,19 +445,17 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                     break;
                 case SEND_VIS:
                     if(bool_onRegister && bool_onProductConnect) {
-
-                        // Intent intent = new Intent(MainActivity.this, Webrtc1.class);
+                    //if(bool_onRegister) {
+                        //Intent intent = new Intent(MainActivity.this, Webrtc1.class);
                         //startActivity(intent);
-
-                        if (bool_onRegister) {
-                            btn_map_widget.setVisibility(View.VISIBLE);
-                            view_userInfo.setVisibility(View.VISIBLE);
-                            view_droneimg.setVisibility(View.VISIBLE);
-                        } else {
-                            view_userInfo.setVisibility(View.INVISIBLE);
-                            view_droneimg.setVisibility(View.INVISIBLE);
-                            btn_map_widget.setVisibility(View.INVISIBLE);
-                        }
+                        //btn_map_widget.setVisibility(View.VISIBLE);
+                        view_userInfo.setVisibility(View.VISIBLE);
+                        view_droneimg.setVisibility(View.VISIBLE);
+                    }
+                    else{
+                        view_userInfo.setVisibility(View.INVISIBLE);
+                        view_droneimg.setVisibility(View.INVISIBLE);
+                        //btn_map_widget.setVisibility(View.INVISIBLE);
                     }
                     break;
 
@@ -453,6 +479,13 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                 message_vis.what = SEND_VIS;
                 handler.sendMessage(message_vis);
 
+                if(!checkUsbConnection){
+                    checkUsbConnection = isConnected();
+                    if(!bool_onProductConnect && checkUsbConnection) {
+                        DJISDKManager.getInstance().destroy();
+                        startSDKRegistration();
+                    }
+                }
 
                 //StringBuilder logmsg = new StringBuilder();
 
@@ -488,7 +521,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
 
                 try {
                     // 1초 씩 딜레이 부여
-                    sleep(1000);
+                    sleep(3000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -544,6 +577,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
         // If there is enough permission, we will start the registration
         if (missingPermission.isEmpty()) {
             startSDKRegistration();
+            LOG.append("의심-missingPermission");
         } else {
             //Toast.makeText(getApplicationContext(), "Missing permissions! Will not register SDK to connect to aircraft.", Toast.LENGTH_LONG).show();
             LOG.append("SDK와 드론이 연결되지 않음, ");

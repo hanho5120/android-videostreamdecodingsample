@@ -10,16 +10,29 @@
     android:paddingStart="60dp"
     android:paddingEnd="60dp">
 
-    <!-- 윗부분-->
+    <!-- 점검 버튼-->
+    <Button
+        android:id="@+id/btn_check"
+        android:layout_width="115dp"
+        android:layout_height="28dp"
+        android:layout_centerVertical="true"
+        android:layout_marginTop="25dp"
+        android:background="@drawable/roundbtn"
+        android:text="확인용"
+        android:textColor="@color/white"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+    <!-- 로그-->
     <RelativeLayout
         android:layout_width="510dp"
         android:layout_height="55dp"
         android:layout_centerHorizontal="true"
         android:layout_gravity="center"
-        android:layout_marginTop="355dp"
+        android:layout_alignParentBottom="true"
         android:background="@color/transparent"
         android:orientation="vertical"
-        android:visibility="visible">
+        android:visibility="gone">
 
 
         <TableRow
@@ -90,7 +103,6 @@
             android:id="@+id/state"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:background="#77000000"
             android:text="처음 초기값"
@@ -101,33 +113,22 @@
     </RelativeLayout>
 
 
-    <!-- 아래부분-->
+    <!-- 팝업창-->
     <RelativeLayout
         android:id="@+id/view_userInfo"
-        android:layout_width="400dp"
-        android:layout_height="250dp"
-        android:layout_below="@+id/view_droneimg"
+        android:layout_width="380dp"
+        android:layout_height="220dp"
         android:layout_centerInParent="true"
-        android:layout_marginTop="-50dp"
         android:background="#232228"
         android:visibility="visible">
 
-
-        <Button
-            android:id="@+id/btn_exit"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_alignParentRight="true"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="10dp"
-            android:background="@drawable/leftmenu_dlg_cancel" />
 
         <EditText
             android:id="@+id/edit_idText"
             android:layout_width="240dp"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="70dp"
+            android:layout_marginTop="60dp"
             android:background="#19181D"
             android:drawableStart="@drawable/ic_baseline_person_24"
             android:gravity="center"
@@ -169,7 +170,7 @@
             android:layout_centerInParent="true"
             android:layout_centerHorizontal="true"
             android:layout_gravity="center"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
             android:background="@drawable/roundbtn"
             android:text="LOG IN"
             android:textColor="@color/white"
@@ -185,8 +186,9 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="-50dp"
         android:background="#00000000"
+        android:layout_alignTop="@+id/view_userInfo"
         android:visibility="visible">
 
         <ImageView

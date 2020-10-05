@@ -57,7 +57,9 @@ public class RemoteDTO {
             }
 
             @Override
+
             public void onAddStream(MediaStream mediaStream) {
+                mediaStream.audioTracks.get(0).setEnabled(true);
                 super.onAddStream(mediaStream);
                 if ( isSharedFlag() ) {
                     try {

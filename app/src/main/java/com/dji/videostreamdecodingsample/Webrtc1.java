@@ -210,6 +210,7 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
 
     public void webRtcInit() {
 
+
         // keep screen on
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -243,7 +244,7 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
         mPeerConnConstraints = new MediaConstraints();
         mPeerConnConstraints.optional.add(new MediaConstraints.KeyValuePair("DtlsSrtpKeyAgreement", "true"));
         mPeerConnConstraints.mandatory.add(new MediaConstraints.KeyValuePair("IceRestart", "true"));
-        mPeerConnConstraints.mandatory.add(new MediaConstraints.KeyValuePair("offerToReceiveAudio", "true"));
+        mPeerConnConstraints.mandatory.add(new MediaConstraints.KeyValuePair("offerToReceiveAudio", "false"));
         mPeerConnConstraints.mandatory.add(new MediaConstraints.KeyValuePair("offerToReceiveVideo", "true"));
 
         // AudioConstraints
@@ -255,6 +256,7 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
 
         // Video
         //mVideoCapturer = createCameraCapturer(new Camera1Enumerator(false));
+
 
         mVideoCapturer = new VideoCapturer() {
             @Override
@@ -288,19 +290,21 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
             }
         };
 
+
+
         mSurfaceTextureHelper = SurfaceTextureHelper.create(Thread.currentThread().getName(), mEglBase.getEglBaseContext());
         mVideoSource = mPeerConnectionFactory.createVideoSource(mVideoCapturer.isScreencast());
         mVideoSource.adaptOutputFormat(mWidth, mHeight, mFps);
 
-        mVideoCapturer.initialize(mSurfaceTextureHelper, getApplicationContext(), mVideoSource.getCapturerObserver());
+        mVideoCapturer.initialize(mSurfaceTextureHelper, this, mVideoSource.getCapturerObserver());
+        mLocalVideoTrack = mPeerConnectionFactory.createVideoTrack("100", mVideoSource);
+
         mVideoCapturer.startCapture(mWidth, mHeight, mFps);
 
         // Audio
         mAudioSource = mPeerConnectionFactory.createAudioSource(mAudioConstraints);
-
-        // Track
         mLocalAudioTrack = mPeerConnectionFactory.createAudioTrack("101", mAudioSource);
-        mLocalVideoTrack = mPeerConnectionFactory.createVideoTrack("100", mVideoSource);
+
     }
 
     @Override
@@ -351,6 +355,8 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
                 continue;
             }
 
+
+
             RemoteDTO remoteDTO = new RemoteDTO();
             remoteDTO.setSocketId(clientSocketId);
 
@@ -385,12 +391,11 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
 
             remoteDTO.addSteam(mPeerConnectionFactory, mLocalAudioTrack, mLocalVideoTrack);
             mRemoteUsers.add(remoteDTO);
+
+
         }
 
-        // 내 소켓에 createoffer 필요 없음
-        if (psId.equals(RemoteSocketClient.getInstance().getSocketId())) {
-            return;
-        }
+
 
         if (piCount >= 2) {
             if (psId.equals(RemoteSocketClient.getInstance().getSocketId())) {
@@ -422,6 +427,7 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
                 }
             });
         }
+
     }
 
     @Override
@@ -565,7 +571,7 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
 
 
             VideoFrame videoFrame = new VideoFrame(buffer, 0, timestampNS);
-            videoSource.getCapturerObserver().onFrameCaptured(videoFrame);
+            mVideoSource.getCapturerObserver().onFrameCaptured(videoFrame);
 
             videoFrame.release();
         }
@@ -599,11 +605,14 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
     }
 
     private void initVideos() {
-        rootEglBase = EglBase.create();
-        localVideoView.init(rootEglBase.getEglBaseContext(), null);
-        remoteVideoView.init(rootEglBase.getEglBaseContext(), null);
+        mEglBase = EglBase.create();
+        localVideoView.init(mEglBase.getEglBaseContext(), null);
+        remoteVideoView.init(mEglBase.getEglBaseContext(), null);
         localVideoView.setZOrderMediaOverlay(true);
         remoteVideoView.setZOrderMediaOverlay(true);
+
+
+        localVideoView.surfaceDestroyed(videostreamPreviewSh);
     }
 
     private void getIceServers() {
@@ -639,8 +648,8 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
         PeerConnection.IceServer turn = PeerConnection.IceServer.builder("turn:101.55.28.31:3478").setUsername("deepfine").setPassword("ckddjq0323").createIceServer();
         //PeerConnection.IceServer turn1 = PeerConnection.IceServer.builder("turn:101.55.28.31:3478?transport=udp").setUsername("deepfine").setPassword("ckddjq0323").createIceServer();
         //PeerConnection.IceServer turn = PeerConnection.IceServer.builder("turn:numb.viagenie.ca:3478?transport=tcp").setUsername("hanhokim@gmail.com").setPassword("rlagksgh").createIceServer();
-        peerIceServers.add(stun);
-        peerIceServers.add(turn);
+        mPeerIceServers.add(stun);
+        mPeerIceServers.add(turn);
         //peerIceServers.add(turn1);
 
 /*
@@ -686,9 +695,7 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
 
     public void start()
     {
-        initViews();
-        initVideos();
-        getIceServers();
+
         webRtcInit();
         RemoteSocketClient.getInstance().init(this);
 

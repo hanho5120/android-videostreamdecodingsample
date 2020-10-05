@@ -398,18 +398,18 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                 case SEND_VIS:
                     if(bool_onRegister && bool_onProductConnect) {
 
-                        Intent intent = new Intent(MainActivity.this, Webrtc1.class);
-                        startActivity(intent);
+                        // Intent intent = new Intent(MainActivity.this, Webrtc1.class);
+                        //startActivity(intent);
 
-                    //if(bool_onRegister) {
-                        //btn_map_widget.setVisibility(View.VISIBLE);
-                        //view_userInfo.setVisibility(View.VISIBLE);
-                        //view_droneimg.setVisibility(View.VISIBLE);
-                    }
-                    else{
-                        view_userInfo.setVisibility(View.INVISIBLE);
-                        view_droneimg.setVisibility(View.INVISIBLE);
-                        //btn_map_widget.setVisibility(View.INVISIBLE);
+                        if (bool_onRegister) {
+                            btn_map_widget.setVisibility(View.VISIBLE);
+                            view_userInfo.setVisibility(View.VISIBLE);
+                            view_droneimg.setVisibility(View.VISIBLE);
+                        } else {
+                            view_userInfo.setVisibility(View.INVISIBLE);
+                            view_droneimg.setVisibility(View.INVISIBLE);
+                            btn_map_widget.setVisibility(View.INVISIBLE);
+                        }
                     }
                     break;
 

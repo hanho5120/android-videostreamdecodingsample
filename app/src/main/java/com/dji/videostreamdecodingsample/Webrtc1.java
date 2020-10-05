@@ -606,6 +606,8 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
 
     private void initVideos() {
         mEglBase = EglBase.create();
+        localVideoView.release();
+        remoteVideoView.release();
         localVideoView.init(mEglBase.getEglBaseContext(), null);
         remoteVideoView.init(mEglBase.getEglBaseContext(), null);
         localVideoView.setZOrderMediaOverlay(true);
@@ -1228,12 +1230,17 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
 
     private void hangup() {
         try {
-            if (localPeer != null) {
-                localPeer.close();
+
+
+
+            for(int i = 0;i<mRemoteUsers.size();i++)
+            {
+                mRemoteUsers.get(i).getPeerConnection().close();
+                mRemoteUsers.get(i).peerConnection = null;
             }
-            localPeer = null;
-            SignallingClient.getInstance().close();
-            updateVideoViews(false);
+
+            RemoteSocketClient.getInstance().close();
+            //updateVideoViews(false);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1876,7 +1883,16 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
 
             switch (demoType) {
                 case USE_SURFACE_VIEW:
+
+                    Intent intent = getIntent();
+                    finish();
+                    startActivity(intent);
+
+                    /*
+                    mCodecManager.enabledYuvData(false);
+                    mCodecManager.setYuvDataCallback(null);
                     startActivity(getIntent());
+                    hangup();
                     /*
                     localVideoView.setVisibility(View.INVISIBLE);
                     localVideoView = null;

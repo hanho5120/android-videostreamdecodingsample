@@ -3,10 +3,13 @@ package com.dji.videostreamdecodingsample;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.hardware.usb.UsbManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -327,8 +330,25 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                 }
             }
         });
+
+        registerReceiver(mUsbDeviceReceiver, new IntentFilter(UsbManager.ACTION_USB_ACCESSORY_ATTACHED));
         checkAndRequestPermissions();
     }
+
+    private final BroadcastReceiver mUsbDeviceReceiver =
+            new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    String action = intent.getAction();
+                    if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
+                        DJISDKManager.getInstance().startConnectionToProduct();
+                        Toast.makeText(getApplicationContext(),"SDK registration failed, check network and retry!",Toast.LENGTH_LONG).show();
+
+                    }else if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
+
+                    }
+                }
+            };
 
 
     public class  NetworkTask extends AsyncTask<Void, Void, String>{
@@ -598,6 +618,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
 
     public static boolean isHereMapsSupported() {
         String abi;
+
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             abi = Build.CPU_ABI;

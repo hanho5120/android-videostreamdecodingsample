@@ -182,8 +182,8 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
     //========================================================= new webrtc ========================================================
     public int mWidth = 854;
     public int mHeight = 480;
-    public int mFps = 30;
-    public int mVideoBitrate = 5000;
+    public int mFps = 20;
+    public int mVideoBitrate = 1600;
     public int mAudioBitrate = 32;
     public int x_google_start_bitrate = 1000;
     public int x_google_min_bitrate = 1000;

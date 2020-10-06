@@ -256,7 +256,6 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
 
 */
                 Userdata.getInstance()._id = edit_idText.getText().toString();
-
                 Userdata.getInstance()._pw = edit_pwText.getText().toString();
 
                 /* DB 대조 */
@@ -400,6 +399,10 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
         @Override
         protected void onPostExecute(String s){
             super.onPostExecute(s);
+              if(s==null) {
+                  Toast.makeText(getApplicationContext(), "참여할 회의가 없습니다.", Toast.LENGTH_LONG).show();
+                  return;
+              }
             try {
                 JSONObject jsonObject = new JSONObject(s);
                 Userdata.getInstance()._code = jsonObject.getInt("code");
@@ -444,8 +447,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                     stateText.setText(msg.obj.toString());
                     break;
                 case SEND_VIS:
-                    if(bool_onRegister && bool_onProductConnect) {
-                    //if(bool_onRegister) {
+                    //디버그
+                    //if(bool_onRegister && bool_onProductConnect) {
+                    if(bool_onRegister) {
                         //Intent intent = new Intent(MainActivity.this, Webrtc1.class);
                         //startActivity(intent);
                         //btn_map_widget.setVisibility(View.VISIBLE);

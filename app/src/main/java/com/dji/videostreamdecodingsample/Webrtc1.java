@@ -91,6 +91,8 @@ import dji.sdk.camera.Camera;
 import dji.sdk.camera.VideoFeeder;
 import dji.sdk.codec.DJICodecManager;
 import dji.thirdparty.afinal.core.AsyncTask;
+import dji.ux.widget.FPVOverlayWidget;
+import dji.ux.widget.FPVWidget;
 import io.socket.client.Socket;
 
 import java.io.UnsupportedEncodingException;
@@ -137,7 +139,8 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
         }
     };
 
-
+    private FPVWidget fpvWidget;
+    private FPVOverlayWidget fpvOverlayWidget;
     private TextureView videostreamPreviewTtView;
     private SurfaceView videostreamPreviewSf;
     private SurfaceHolder videostreamPreviewSh;
@@ -602,6 +605,18 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
         localVideoView = findViewById(R.id.surface_view);
         remoteVideoView = findViewById(R.id.surface_view_remote);
 
+
+        //-----------------------짐벌ㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹ-----------------------------
+        fpvWidget = (FPVWidget) findViewById(R.id.fpv_widget);
+        fpvWidget.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+        fpvOverlayWidget = (FPVOverlayWidget) findViewById(R.id.fpv_overlay_widget);
+        fpvOverlayWidget.setGimbalControlEnabled(true);
     }
 
     private void initVideos() {
@@ -612,8 +627,6 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
         remoteVideoView.init(mEglBase.getEglBaseContext(), null);
         localVideoView.setZOrderMediaOverlay(true);
         remoteVideoView.setZOrderMediaOverlay(true);
-
-
         localVideoView.surfaceDestroyed(videostreamPreviewSh);
     }
 

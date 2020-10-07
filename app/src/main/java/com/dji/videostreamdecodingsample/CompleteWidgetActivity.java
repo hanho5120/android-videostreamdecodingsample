@@ -110,7 +110,7 @@ public class CompleteWidgetActivity extends Activity {
         });
         primaryVideoView = (RelativeLayout) findViewById(R.id.fpv_container);
         secondaryVideoView = (FrameLayout) findViewById(R.id.secondary_video_view);
-        secondaryFPVWidget = findViewById(R.id.secondary_fpv_widget);
+        secondaryFPVWidget = (FPVWidget) findViewById(R.id.secondary_fpv_widget);
         secondaryFPVWidget.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

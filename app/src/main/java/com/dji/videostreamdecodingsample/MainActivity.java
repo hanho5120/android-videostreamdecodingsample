@@ -81,6 +81,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
     View view_userInfo;
     View view_droneimg;
     View view_background;
+    View view_inform;
     boolean checkUsbConnection;
 
 
@@ -229,6 +230,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
         view_userInfo = (View) findViewById(R.id.view_userInfo);
         view_droneimg = (View) findViewById(R.id.view_droneimg);
         view_background = (View) findViewById(R.id.view_background);
+        view_inform = (View) findViewById(R.id.view_inform);
         view_background.setOnClickListener(new View.OnClickListener(){
 
             @Override
@@ -448,18 +450,18 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                     break;
                 case SEND_VIS:
                     //디버그
-                    //if(bool_onRegister && bool_onProductConnect) {
-                    if(bool_onRegister) {
+                    if(bool_onRegister && bool_onProductConnect) {
+                    //if(bool_onRegister) {
                         //Intent intent = new Intent(MainActivity.this, Webrtc1.class);
-                        //startActivity(intent);
                         //btn_map_widget.setVisibility(View.VISIBLE);
                         view_userInfo.setVisibility(View.VISIBLE);
                         view_droneimg.setVisibility(View.VISIBLE);
+                        view_inform.setVisibility(View.INVISIBLE);
                     }
                     else{
                         view_userInfo.setVisibility(View.INVISIBLE);
                         view_droneimg.setVisibility(View.INVISIBLE);
-                        //btn_map_widget.setVisibility(View.INVISIBLE);
+                        view_inform.setVisibility(View.VISIBLE);
                     }
                     break;
 

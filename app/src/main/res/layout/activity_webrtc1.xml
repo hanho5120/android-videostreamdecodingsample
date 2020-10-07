@@ -8,7 +8,6 @@
     android:id="@+id/root_view"
     tools:context=".MainActivity">
 
-
     <TextureView
         android:id="@+id/livestream_preview_ttv"
         android:layout_width="match_parent"
@@ -16,14 +15,12 @@
         android:layout_centerInParent="true"
         android:layout_gravity="center"
         android:alpha="50"
-        android:visibility="visible"
-        android:layout_below="@id/main_title_rl"/>
+        android:visibility="visible" />
 
     <SurfaceView
         android:id="@+id/livestream_preview_sf"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/main_title_rl"
         android:layout_centerInParent="true"
         android:layout_gravity="center"
         android:visibility="visible" />
@@ -35,11 +32,35 @@
         android:layout_centerInParent="true"
         android:layout_gravity="center" />
 
+    <!-- 짐벌-->
+    <RelativeLayout
+        android:id="@+id/fpv_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible"
+        >
+
+        <dji.ux.widget.FPVWidget
+            android:id="@+id/fpv_widget"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            />
+
+    </RelativeLayout>
+
+    <dji.ux.widget.FPVOverlayWidget
+        android:id="@+id/fpv_overlay_widget"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#00000000"
+        />
+
+
     <org.webrtc.SurfaceViewRenderer
         android:id="@+id/surface_view_remote"
         android:layout_width="1dp"
         android:layout_height="1dp"
-        android:layout_below="@id/main_title_rl"
         android:layout_marginTop="253dp" />
 
     <LinearLayout
@@ -94,7 +115,6 @@
         android:id="@+id/activity_main_save_path"
         android:layout_width="400dp"
         android:layout_height="match_parent"
-        android:layout_below="@id/main_title_rl"
         android:layout_alignParentRight="true"
         android:layout_marginLeft="-141dp"
         android:layout_marginTop="0dp"
@@ -107,6 +127,7 @@
         android:visibility="invisible"
 
         />
+
 
 
     <LinearLayout
@@ -174,10 +195,7 @@
             tools:ignore="RtlHardcoded" />
 
     </LinearLayout>
-    <!--
-    android:layout_toRightOf="@id/activity_main_screen_shot"
-얘는 왜 오류지?
--->
+
 
 
 </RelativeLayout>

@@ -423,7 +423,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                 Userdata.getInstance()._reg_date = jsonObject1.getString("reg_date");
                 Userdata.getInstance()._start_date = jsonObject1.getString("start_date");
                 Userdata.getInstance()._name = jsonObject1.getString("name");
-                Userdata.getInstance()._profile_photo = jsonObject1.getString("profile_photo");
+                //Userdata.getInstance()._profile_photo = jsonObject1.getString("profile_photo");
 
                 if(Userdata.getInstance()._message !="success" || Userdata.getInstance()._room_key != "" ) {
                     Intent intent = new Intent(MainActivity.this, Webrtc1.class);

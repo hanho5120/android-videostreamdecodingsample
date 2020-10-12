@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import org.webrtc.IceCandidate;
 import org.webrtc.SessionDescription;
 
+import java.net.InetSocketAddress;
 import java.net.URISyntaxException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -134,6 +135,9 @@ public class RemoteSocketClient {
      * @param poCallback
      */
     public void init(RemoteSocketInterface.SocketListner poCallback) {
+        if(mSocket!=null)
+            return;
+
         this.mCallback = poCallback;
 
         close();
@@ -151,6 +155,7 @@ public class RemoteSocketClient {
             mSocket.on("signal", gotMessageFromServer);
 
             mSocket.connect();
+
         }
         catch ( Exception e ) {
             e.printStackTrace();

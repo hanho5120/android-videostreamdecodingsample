@@ -155,6 +155,7 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
     private int videoViewHeight;
     private int count;
     private  Socket socket;
+    private boolean started = false;
 
      ////////// ==== webrtc =====
 
@@ -722,6 +723,10 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
     {
         //count++;
         //showToast(" "+count);
+        if(started)
+            return;
+
+        started=true;
 
         webRtcInit();
         RemoteSocketClient.getInstance().init(this);
@@ -1265,6 +1270,7 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
             }
 
             RemoteSocketClient.getInstance().close();
+            started= false;
             //updateVideoViews(false);
         } catch (Exception e) {
             e.printStackTrace();
@@ -1369,7 +1375,6 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
 
         if(SignallingClient.getInstance()!=null)
         {
-
             SignallingClient.getInstance().close();
         }
 

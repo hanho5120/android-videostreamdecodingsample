@@ -21,7 +21,7 @@ public class Userdata{
     public String _reg_date;
     public String _start_date;
     public String _name;
-    public String _profile_photo;
+    //public String _profile_photo;
 
     public String _server_url="https://101.55.28.64:444";
 

@@ -27,6 +27,8 @@ public class RemoteSocketClient {
     protected static Socket mSocket;
     protected static RemoteSocketClient INSTANCE;
     protected static RemoteSocketInterface.SocketListner mCallback;
+    public static int count1;
+    public static int count;
 
     public static synchronized RemoteSocketClient getInstance() {
         if ( null == INSTANCE ) {
@@ -45,6 +47,7 @@ public class RemoteSocketClient {
     }};
 
     public static Emitter.Listener onConnect = (args) -> {
+        count++;
         mCallback.onConnect();
     };
 
@@ -60,6 +63,7 @@ public class RemoteSocketClient {
         String lsId = "";
         int liCount = 0;
         ArrayList<String> clients = new ArrayList<>();
+        ArrayList<String> temp = new ArrayList<>();
 
         try {
             lsId = args[0].toString();
@@ -70,12 +74,18 @@ public class RemoteSocketClient {
             for ( int i = 0; i < jsonArray.length(); i++ ) {
                 clients.add(jsonArray.getString(i));
             }
+
+            JSONArray jsonArray1 = new JSONArray(args[3].toString());
+
+            for ( int i = 0; i < jsonArray.length(); i++ ) {
+                temp.add(jsonArray.getString(i));
+            }
         }
         catch ( Exception e ) {
             e.printStackTrace();
         }
         finally {
-            mCallback.user_joined(lsId, liCount, clients);
+            mCallback.user_joined(lsId, liCount, clients, temp);
         }
     };
 
@@ -127,13 +137,13 @@ public class RemoteSocketClient {
         this.mCallback = poCallback;
 
         close();
-
+        count1++;
         try {
             SSLContext sslcontext = SSLContext.getInstance("TLS");
             sslcontext.init(null, trustAllCerts, null);
             IO.setDefaultHostnameVerifier((hostname, session) -> true);
             IO.setDefaultSSLContext(sslcontext);
-            mSocket = IO.socket("https://101.55.28.64:444");
+            mSocket = IO.socket(Userdata.getInstance()._server_url);
             mSocket.on(Socket.EVENT_CONNECT, onConnect);
             mSocket.on(Socket.EVENT_DISCONNECT, onDisConnect);
             mSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);

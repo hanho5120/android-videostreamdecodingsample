@@ -78,7 +78,7 @@
             android:clickable="true"
             android:onClick="onClick"
             android:gravity="center"
-            android:visibility="visible"/>
+            android:visibility="gone"/>
 
         <Button
             android:id="@+id/activity_main_screen_surface_with_own_decoder"
@@ -88,7 +88,7 @@
             android:clickable="true"
             android:onClick="onClick"
             android:gravity="center"
-            android:visibility="visible"/>
+            android:visibility="gone"/>
 
         <Button
             android:id="@+id/activity_main_screen_surface"
@@ -97,13 +97,13 @@
             android:text="Demo SurfaceView"
             android:onClick="onClick"
             android:gravity="center"
-            android:visibility="visible"/>
+            android:visibility="gone"/>
 
 
         <Button
             android:id="@+id/activity_main_screen_shot"
             android:layout_width="150dp"
-            android:layout_height="wrap_content"
+            android:layout_height="100dp"
             android:text="관제 시작"
             android:clickable="true"
             android:onClick="onClick"

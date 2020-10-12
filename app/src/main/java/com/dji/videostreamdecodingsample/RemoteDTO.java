@@ -59,7 +59,7 @@ public class RemoteDTO {
             @Override
 
             public void onAddStream(MediaStream mediaStream) {
-                mediaStream.audioTracks.get(0).setEnabled(false);
+                //mediaStream.audioTracks.get(0).setEnabled(false);
                 super.onAddStream(mediaStream);
                 if ( isSharedFlag() ) {
                     try {
@@ -81,7 +81,7 @@ public class RemoteDTO {
         stream = poFactory.createLocalMediaStream("102");
         stream.addTrack(poLocalVideoTrack);
         stream.addTrack(poLocalAudioTrack);
-        stream.audioTracks.get(0).setEnabled(false);
+       // stream.audioTracks.get(0).setEnabled(false);
         peerConnection.addStream(stream);
     }
 

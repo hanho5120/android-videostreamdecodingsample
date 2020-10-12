@@ -4,6 +4,8 @@ package com.dji.videostreamdecodingsample;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Point;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -16,6 +18,7 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -80,7 +83,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
 
 import dji.common.camera.SettingsDefinitions;
 import dji.common.error.DJIError;
@@ -164,6 +166,9 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
     VideoTrack localVideoTrack;
     AudioSource audioSource;
     AudioTrack localAudioTrack;
+    AudioManager am;
+
+
     SurfaceTextureHelper surfaceTextureHelper;
 
     SurfaceViewRenderer localVideoView;
@@ -247,7 +252,7 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
         mPeerConnConstraints = new MediaConstraints();
         mPeerConnConstraints.optional.add(new MediaConstraints.KeyValuePair("DtlsSrtpKeyAgreement", "true"));
         mPeerConnConstraints.mandatory.add(new MediaConstraints.KeyValuePair("IceRestart", "true"));
-        mPeerConnConstraints.mandatory.add(new MediaConstraints.KeyValuePair("offerToReceiveAudio", "false"));
+        mPeerConnConstraints.mandatory.add(new MediaConstraints.KeyValuePair("offerToReceiveAudio", "true"));
         mPeerConnConstraints.mandatory.add(new MediaConstraints.KeyValuePair("offerToReceiveVideo", "true"));
 
         // AudioConstraints
@@ -256,7 +261,9 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
         mAudioConstraints.mandatory.add(new MediaConstraints.KeyValuePair("googEchoCancellation", "true"));
         mAudioConstraints.mandatory.add(new MediaConstraints.KeyValuePair("echoCancellation", "true"));
         mAudioConstraints.mandatory.add(new MediaConstraints.KeyValuePair("noiseSuppression", "true"));
-
+        am = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+        am.setSpeakerphoneOn(true);
+        am.setMode(AudioManager.MODE_IN_COMMUNICATION);
         // Video
         //mVideoCapturer = createCameraCapturer(new Camera1Enumerator(false));
 
@@ -312,6 +319,9 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
 
     @Override
     public void onConnect() {
+        //count++;
+        //showToast(" "+count);
+        showToast(RemoteSocketClient.getInstance().count+"========"+RemoteSocketClient.getInstance().count1);
         try {
             JSONObject datalogin = new JSONObject();
             try {
@@ -347,7 +357,7 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void user_joined(String psId, int piCount, ArrayList<String> poClients) {
+    public void user_joined(String psId, int piCount, ArrayList<String> poClients, ArrayList<String> tmep) {
         for (String clientSocketId : poClients) {
             // 내영상은 Array 에 담을 필요가 없음
             if (clientSocketId.equals(RemoteSocketClient.getInstance().getSocketId())) {
@@ -710,6 +720,8 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
 
     public void start()
     {
+        //count++;
+        //showToast(" "+count);
 
         webRtcInit();
         RemoteSocketClient.getInstance().init(this);
@@ -1375,9 +1387,19 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_webrtc1);
         initUi();
+
+        WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+        final Display display = windowManager.getDefaultDisplay();
+        Point outPoint = new Point();
+        display.getRealSize(outPoint);
+        mDeviceHeight = outPoint.y;
+        mDeviceWidth = outPoint.x;
+        //Toast.makeText(getApplicationContext(), mDeviceHeight , Toast.LENGTH_LONG).show();
+        //Toast.makeText(getApplicationContext(), "SDK registration succeeded!", Toast.LENGTH_LONG).show();
+
+
 
         //Intent intent = getIntent();
         //Bundle bundle = intent.getExtras();
@@ -1832,7 +1854,7 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
             DemoType newDemoType = null;
             if (v.getId() == R.id.activity_main_screen_texture) {
                 try{
-                    start();
+                    //start();
 
                 }catch (Exception e)
                 {

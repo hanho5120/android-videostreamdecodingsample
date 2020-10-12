@@ -12,7 +12,7 @@ public class RemoteSocketInterface {
         void onConnect();
         void onConnectError(String psMsg) ;
         void onDisConnect(String psMsg);
-        void user_joined(String psId, int piCount, ArrayList<String> poClients);
+        void user_joined(String psId, int piCount, ArrayList<String> poClients , ArrayList<String> temp);
         void user_left(String psId);
         void gotMessageFromServer(String psId, JSONObject signal);
         void goChatMsg(JSONObject poData);

@@ -266,7 +266,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                 JsonObject temp = new JsonObject();
 
                 temp.addProperty("login_key", "24d2bd1d-5617-46cd-a49c-e1ecbb69fc4d");
-                NetworkTask networkTask = new NetworkTask("https://101.55.28.64:444/api/get-conference-list ", temp);
+                //NetworkTask networkTask = new NetworkTask("https://101.55.28.64:444/api/get-conference-list", temp);
+                NetworkTask networkTask = new NetworkTask(Userdata.getInstance()._server_url+"/api/get-conference-list", temp);
                 //LOG.append(Userdata.getInstance()._id.toString() +", "+Userdata.getInstance()._pw.toString()+", ");
                 if(Userdata.getInstance()._id.equals("") || Userdata.getInstance()._pw.equals("")) {
                     LOG.append("ID 또는 PW를 확인해주세요, ");
@@ -453,6 +454,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                     if(bool_onRegister && bool_onProductConnect) {
                     //if(bool_onRegister) {
                         //Intent intent = new Intent(MainActivity.this, Webrtc1.class);
+                        //startActivity(intent);
                         //btn_map_widget.setVisibility(View.VISIBLE);
                         view_userInfo.setVisibility(View.VISIBLE);
                         view_droneimg.setVisibility(View.VISIBLE);

@@ -23,6 +23,9 @@ public class Userdata{
     public String _name;
     public String _profile_photo;
 
+    public String _server_url="https://101.55.28.64:444";
+
+
     private Userdata(){}
 
     public static Userdata getInstance(){

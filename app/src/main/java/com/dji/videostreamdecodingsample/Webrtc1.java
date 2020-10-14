@@ -4,6 +4,7 @@ package com.dji.videostreamdecodingsample;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.media.AudioManager;
 import android.os.Bundle;
@@ -22,9 +23,13 @@ import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import org.json.JSONException;
@@ -164,7 +169,11 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
     private Camera mCamera;
     private DJICodecManager mCodecManager;
     private TextView savePath;
-    private Button screenShot;
+
+    private RelativeLayout screenShot;
+    private ImageView img_screenShot;
+    private TextView text_screenShot;
+
     private StringBuilder stringBuilder;
     private int videoViewWidth;
     private int videoViewHeight;
@@ -1418,8 +1427,6 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
         //Toast.makeText(getApplicationContext(), mDeviceHeight , Toast.LENGTH_LONG).show();
         //Toast.makeText(getApplicationContext(), "SDK registration succeeded!", Toast.LENGTH_LONG).show();
 
-
-
         //Intent intent = getIntent();
         //Bundle bundle = intent.getExtras();
         //String getdroneid = bundle.getString("droneid");
@@ -1445,8 +1452,13 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
 
     private void initUi() {
         savePath = (TextView) findViewById(R.id.activity_main_save_path);
-        screenShot = (Button) findViewById(R.id.activity_main_screen_shot);
+
+        screenShot = (RelativeLayout) findViewById(R.id.activity_main_screen_shot);
         screenShot.setSelected(false);
+
+        text_screenShot = (TextView) findViewById(R.id.text_screenShot);
+        img_screenShot = (ImageView) findViewById(R.id.img_screenShot);
+
         titleTv = (TextView) findViewById(R.id.title_tv);
         videostreamPreviewTtView = (TextureView) findViewById(R.id.livestream_preview_ttv);
         videostreamPreviewSf = (SurfaceView) findViewById(R.id.livestream_preview_sf);
@@ -1905,8 +1917,8 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
 
     private void clickyuv()
     {
-        screenShot.setText("YUV Screen Shot");
-        screenShot.setSelected(false);
+        //screenShot.setText("YUV Screen Shot");
+        //screenShot.setSelected(false);
 
 
         switch (demoType) {
@@ -1931,7 +1943,9 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
     private void handleYUVClick() throws InterruptedException {
 
         if (screenShot.isSelected()) {
-            screenShot.setText("관제 시작");
+            text_screenShot.setText("관제 시작");
+            text_screenShot.setTextColor(Color.WHITE);
+            img_screenShot.setBackgroundResource(R.drawable.video_camera);
             screenShot.setSelected(false);
 
 
@@ -1973,7 +1987,10 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
             savePath.setVisibility(View.INVISIBLE);
             stringBuilder = null;
         } else {
-            screenShot.setText("관제 중지");
+            img_screenShot.setBackgroundResource(R.drawable.video_camera_pink);
+            text_screenShot.setText("관제 중지");
+            startBlinkingAnimation(text_screenShot);
+            text_screenShot.setTextColor(Color.RED);
             screenShot.setSelected(true);
 
             switch (demoType) {
@@ -1994,6 +2011,13 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
             savePath.setVisibility(View.INVISIBLE);
         }
 
+    }
+
+    //깜빡
+    public void startBlinkingAnimation(View view) {
+        TextView textView = (TextView) findViewById(R.id.text_screenShot);
+        Animation startAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.blink_animation);
+        textView.startAnimation(startAnimation);
     }
 
     private void displayPath(String path) {

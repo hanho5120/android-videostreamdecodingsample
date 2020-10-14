@@ -20,6 +20,8 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+//import dji.thirdparty.org.java_websocket.WebSocket;
+import io.socket.engineio.client.transports.WebSocket;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
@@ -99,7 +101,7 @@ public class RemoteSocketClient {
         }
     };
 
-/*
+
     public static Emitter.Listener user_left = (args) -> {
         mCallback.user_left(args[0].toString());
     };
@@ -108,6 +110,7 @@ public class RemoteSocketClient {
         mCallback.goChatMsg((JSONObject) args[0]);
     };
 
+    /*
     public static Emitter.Listener goZoom = (args) -> {
         mCallback.goZoom(args[0].toString());
     };
@@ -124,19 +127,23 @@ public class RemoteSocketClient {
         mCallback.goMark((JSONObject) args[0]);
     };
 
+    public static Emitter.Listener goFile = (args) -> {
+        mCallback.goFile(args[0].toString());
+    };
+
     public static Emitter.Listener goScreen = (args) -> {
         mCallback.goScreen(args[0].toString());
     };
-    */
 
+*/
 
     /**
      * 소켓 연결
      * @param poCallback
      */
     public void init(RemoteSocketInterface.SocketListner poCallback) {
-        if(mSocket!=null)
-            return;
+        //if(mSocket!=null)
+        //    return;
 
         this.mCallback = poCallback;
 
@@ -145,9 +152,18 @@ public class RemoteSocketClient {
         try {
             SSLContext sslcontext = SSLContext.getInstance("TLS");
             sslcontext.init(null, trustAllCerts, null);
+
             IO.setDefaultHostnameVerifier((hostname, session) -> true);
             IO.setDefaultSSLContext(sslcontext);
-            mSocket = IO.socket(Userdata.getInstance()._server_url);
+
+            //201014 수정부분
+            IO.Options opt = new IO.Options();
+            opt.sslContext = sslcontext;
+            opt.transports = new String[]{WebSocket.NAME};
+
+            //mSocket = IO.socket(Userdata.getInstance()._server_url);
+            mSocket = IO.socket(Userdata.getInstance()._server_url, opt);
+
             mSocket.on(Socket.EVENT_CONNECT, onConnect);
             mSocket.on(Socket.EVENT_DISCONNECT, onDisConnect);
             mSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);

@@ -122,7 +122,70 @@
         android:background="#232228"
         android:visibility="visible">
 
+        <ImageButton
+            android:id="@+id/btn_drone1"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="60dp"
+            android:backgroundTint="@color/white"
+            />
+        <TextView
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btn_drone1"
+            android:layout_marginLeft="60dp"
+            android:layout_alignParentLeft="true"
+            android:gravity="center"
+            android:text="드론 1"
+            android:textColor="@color/white"
+            android:textSize="18dp"
+            android:textStyle="bold"
+            android:background="#00000000"
+            />
 
+
+        <ImageButton
+            android:id="@+id/btn_drone2"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="60dp"
+            android:backgroundTint="@color/white"
+            />
+
+        <TextView
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btn_drone2"
+            android:layout_marginRight="60dp"
+            android:layout_alignParentRight="true"
+            android:gravity="center"
+            android:text="드론 2"
+            android:textColor="@color/white"
+            android:textSize="18dp"
+            android:textStyle="bold"
+            android:background="#00000000"
+            />
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#00000000"
+            android:fontFamily="monospace"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="15dp"
+            android:gravity="center"
+            android:text="접속하실 드론을 선택해 주세요."
+            android:textColor="@color/white"
+            android:textSize="18dp"
+            android:textStyle="bold" />
+
+
+<!--   이전 쓰던 아이디 비밀번호
         <EditText
             android:id="@+id/edit_idText"
             android:layout_width="240dp"
@@ -177,7 +240,7 @@
             android:textSize="15sp"
             android:textStyle="bold"
             android:visibility="visible" />
-
+-->
     </RelativeLayout>
 
     <!--드론 이미지-->

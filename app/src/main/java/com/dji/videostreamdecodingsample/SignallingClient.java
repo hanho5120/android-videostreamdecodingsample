@@ -2,6 +2,7 @@ package com.dji.videostreamdecodingsample;
 
 import android.annotation.SuppressLint;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -81,7 +82,11 @@ class SignallingClient {
 
             JSONObject datalogin = new JSONObject();
             try {
-                datalogin.put("login_key", Userdata.getInstance()._login_key);
+                if(Userdata.getInstance()._selected_drone==1)
+                    datalogin.put("login_key", Userdata.getInstance()._login_key1);
+                else if(Userdata.getInstance()._selected_drone==2)
+                    datalogin.put("login_key", Userdata.getInstance()._login_key2);
+
                 datalogin.put("login_id", "don");
                 datalogin.put("status", "Y");
                 datalogin.put("type", "D");

@@ -27,6 +27,7 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -74,6 +75,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
     TextView stateText;
     Handler mHandler = null;
     Thread mThread = null;
+    ImageButton btn_drone1;
+    ImageButton btn_drone2;
     Button btn_map_widget;
     Button btn_check;
     TextView edit_idText;
@@ -222,9 +225,42 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
         findViewById(R.id.bt_customized_ui_widgets).setOnClickListener(this);
 
         //추가 부분--------------
-        btn_map_widget = (Button) findViewById(R.id.btn_map_widget);
+        //btn_map_widget = (Button) findViewById(R.id.btn_map_widget);
         btn_check = (Button) findViewById(R.id.btn_check);
+        btn_drone1 = (ImageButton) findViewById(R.id.btn_drone1);
+        btn_drone1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Userdata.getInstance()._selected_drone=1;
+                ContentValues values = new ContentValues();
+                //values.put("login_key", "24d2bd1d-5617-46cd-a49c-e1ecbb69fc4d");
+                JsonObject temp = new JsonObject();
 
+                temp.addProperty("login_key", "6ce55a01-67e7-460b-afe1-648ebf9ea187");
+                //NetworkTask networkTask = new NetworkTask("https://101.55.28.64:444/api/get-conference-list", temp);
+                NetworkTask networkTask = new NetworkTask(Userdata.getInstance()._server_url+"/api/get-conference-list", temp);
+                //LOG.append(Userdata.getInstance()._id.toString() +", "+Userdata.getInstance()._pw.toString()+", ");
+                //Toast.makeText(getApplicationContext(), "드론1 로그인", Toast.LENGTH_LONG).show();
+                networkTask.execute();
+            }
+        });
+        btn_drone2 = (ImageButton) findViewById(R.id.btn_drone2);
+        btn_drone2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Userdata.getInstance()._selected_drone=2;
+                ContentValues values = new ContentValues();
+                //values.put("login_key", "24d2bd1d-5617-46cd-a49c-e1ecbb69fc4d");
+                JsonObject temp = new JsonObject();
+
+                temp.addProperty("login_key", "71ac032e-3780-49d1-8dd4-8e64e8e81ff4");
+                //NetworkTask networkTask = new NetworkTask("https://101.55.28.64:444/api/get-conference-list", temp);
+                NetworkTask networkTask = new NetworkTask(Userdata.getInstance()._server_url+"/api/get-conference-list", temp);
+                //LOG.append(Userdata.getInstance()._id.toString() +", "+Userdata.getInstance()._pw.toString()+", ");
+                //Toast.makeText(getApplicationContext(), "드론2 로그인", Toast.LENGTH_LONG).show();
+                networkTask.execute();
+            }
+        });
         //로그인정보
 
         view_userInfo = (View) findViewById(R.id.view_userInfo);
@@ -238,17 +274,17 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                 //bool_onRegister=true;
             }
         });
-        edit_idText = (TextView) findViewById(R.id.edit_idText);
-        edit_pwText = (TextView) findViewById(R.id.edit_pwText);
+        //edit_idText = (TextView) findViewById(R.id.edit_idText);
+        //edit_pwText = (TextView) findViewById(R.id.edit_pwText);
 
-        findViewById(R.id.btn_map_widget).setOnClickListener(this);
+        //findViewById(R.id.btn_map_widget).setOnClickListener(this);
 
-
+/*
         btn_map_widget.setOnClickListener(new View.OnClickListener(){
         //보내는것
             @Override
             public void onClick(View v) {
-                /*
+
                 String droneid = edit_idText.getText().toString();
                 String dronepw = edit_pwText.getText().toString();
 
@@ -256,11 +292,11 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                 intent.putExtra("droneid",droneid);
                 intent.putExtra("dronepw",dronepw);
 
-*/
+
                 Userdata.getInstance()._id = edit_idText.getText().toString();
                 Userdata.getInstance()._pw = edit_pwText.getText().toString();
 
-                /* DB 대조 */
+                // DB 대조
                 ContentValues values = new ContentValues();
                 //values.put("login_key", "24d2bd1d-5617-46cd-a49c-e1ecbb69fc4d");
                 JsonObject temp = new JsonObject();
@@ -283,7 +319,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                 //startActivity(intent);
             }
         });
-
+*/
         findViewById(R.id.btn_check).setOnClickListener(this);
 
         btn_check.setOnClickListener(new View.OnClickListener(){
@@ -381,7 +417,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
         return intent.getExtras().getBoolean("connected");
     }
 
-    public class  NetworkTask extends AsyncTask<Void, Void, String>{
+    public class NetworkTask extends AsyncTask<Void, Void, String>{
 
         private String url;
         private JsonObject values;
@@ -434,6 +470,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                 }
 
             } catch (JSONException e) {
+                Toast.makeText(getApplicationContext(), "드론"+Userdata.getInstance()._selected_drone+"이(가) 초대되지 않았습니다.", Toast.LENGTH_LONG).show();
                 e.printStackTrace();
             }
 
@@ -451,14 +488,14 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                     break;
                 case SEND_VIS:
                     //디버그
-                    //if(bool_onRegister && bool_onProductConnect) {
-                    if(bool_onRegister) {
-                        Intent intent = new Intent(MainActivity.this, Webrtc1.class);
-                        startActivity(intent);
+                    if(bool_onRegister && bool_onProductConnect) {
+                    //if(bool_onRegister) {
+                        //Intent intent = new Intent(MainActivity.this, Webrtc1.class);
+                        //startActivity(intent);
                         //btn_map_widget.setVisibility(View.VISIBLE);
-                        //view_userInfo.setVisibility(View.VISIBLE);
-                        //view_droneimg.setVisibility(View.VISIBLE);
-                        //view_inform.setVisibility(View.INVISIBLE);
+                        view_userInfo.setVisibility(View.VISIBLE);
+                        view_droneimg.setVisibility(View.VISIBLE);
+                        view_inform.setVisibility(View.INVISIBLE);
                     }
                     else{
                         view_userInfo.setVisibility(View.INVISIBLE);

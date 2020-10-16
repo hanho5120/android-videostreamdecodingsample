@@ -162,6 +162,7 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
     };
 
     private FPVWidget fpvWidget;
+    private RelativeLayout primaryVideoView;
     private FPVOverlayWidget fpvOverlayWidget;
     private TextureView videostreamPreviewTtView;
     private SurfaceView videostreamPreviewSf;
@@ -325,7 +326,6 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
         };
 
 
-
         mSurfaceTextureHelper = SurfaceTextureHelper.create(Thread.currentThread().getName(), mEglBase.getEglBaseContext());
         mVideoSource = mPeerConnectionFactory.createVideoSource(mVideoCapturer.isScreencast());
         mVideoSource.adaptOutputFormat(mWidth, mHeight, mFps);
@@ -349,7 +349,12 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
         try {
             JSONObject datalogin = new JSONObject();
             try {
-                datalogin.put("login_key", Userdata.getInstance()._login_key);
+
+                //datalogin.put("login_key", Userdata.getInstance()._login_key);
+                if(Userdata.getInstance()._selected_drone==1)
+                    datalogin.put("login_key", Userdata.getInstance()._login_key1);
+                else if(Userdata.getInstance()._selected_drone==2)
+                    datalogin.put("login_key", Userdata.getInstance()._login_key2);
                 datalogin.put("login_id", "don");
                 datalogin.put("status", "Y");
                 datalogin.put("type", "D");
@@ -649,6 +654,7 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
 
             }
         });
+        primaryVideoView = (RelativeLayout) findViewById(R.id.fpv_container);
         fpvOverlayWidget = (FPVOverlayWidget) findViewById(R.id.fpv_overlay_widget);
         fpvOverlayWidget.setGimbalControlEnabled(true);
     }
@@ -762,6 +768,7 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
 
     }
 
+    //안써ㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓ
     public void start_old() {
 
 
@@ -1592,6 +1599,7 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
                 videoViewHeight = height;
                 Log.d(TAG, "real onSurfaceTextureAvailable: width " + videoViewWidth + " height " + videoViewHeight);
                 if (mCodecManager == null) {
+                    //mCodecManager = new DJICodecManager(getApplicationContext(), surface, width, height);
                     mCodecManager = new DJICodecManager(getApplicationContext(), surface, width, height);
                 }
             }
@@ -1622,29 +1630,31 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
      * Init a surface view for the DJIVideoStreamDecoder
      */
     private void initPreviewerSurfaceView() {
+        //videoViewWidth = mDeviceHeight/9*16;
+        //videoViewHeight = mDeviceHeight;
 
-
+        //사이즈는 조절 되는데 중앙정렬이 안됨.ㅇㅁㅇㅁㄴㅇㅁㄴㅇㅁㄴㅇ
         videostreamPreviewSh = videostreamPreviewSf.getHolder();
-
-
-
+        //videostreamPreviewSf.setPadding((mDeviceWidth-videoViewWidth)/2,0,(mDeviceWidth-videoViewWidth)/2,0);
         surfaceCallback = new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
-
-
-
 
                 Log.d(TAG, "real onSurfaceTextureAvailable");
                 videoViewWidth = videostreamPreviewSf.getWidth();
                 videoViewHeight = videostreamPreviewSf.getHeight();
 
+                Toast.makeText(getApplicationContext(), "가로 : "+videoViewWidth +", 세로 : "+videoViewHeight, Toast.LENGTH_SHORT).show();
+
                 Log.d(TAG, "real onSurfaceTextureAvailable3: width " + videoViewWidth + " height " + videoViewHeight);
                 switch (demoType) {
                     case USE_SURFACE_VIEW:
                         if (mCodecManager == null) {
-                            mCodecManager = new DJICodecManager(getApplicationContext(), holder, videoViewWidth,
-                                    videoViewHeight);
+                            mCodecManager = new DJICodecManager(getApplicationContext(), holder, videoViewWidth, videoViewHeight);
+                            //mCodecManager = new DJICodecManager(getApplicationContext(),holder,videoViewWidth,videoViewHeight,null,true);
+                            //resizeFPVWidget(videoViewWidth, videoViewHeight, (mDeviceWidth-videoViewWidth)/2);
+
+                            //mCodecManager.onSurfaceSizeChanged(videoViewWidth,videoViewHeight,0);
                         }
                         break;
                     case USE_SURFACE_VIEW_DEMO_DECODER:
@@ -1691,8 +1701,9 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
 
             }
         };
-
+        //videostreamPreviewSh.setFixedSize(mDeviceWidth, mDeviceHeight);
         videostreamPreviewSh.addCallback(surfaceCallback);
+
     }
 
 
@@ -2018,6 +2029,18 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
         TextView textView = (TextView) findViewById(R.id.text_screenShot);
         Animation startAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.blink_animation);
         textView.startAnimation(startAnimation);
+    }
+
+    //사이즈
+    private void resizeFPVWidget(int width, int height, int margin) {
+        RelativeLayout.LayoutParams fpvParams = (RelativeLayout.LayoutParams) primaryVideoView.getLayoutParams();
+        fpvParams.height = height;
+        fpvParams.width = width;
+        fpvParams.rightMargin = margin;
+
+        fpvParams.addRule(RelativeLayout.CENTER_IN_PARENT, 0);
+        primaryVideoView.setLayoutParams(fpvParams);
+
     }
 
     private void displayPath(String path) {

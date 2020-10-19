@@ -124,18 +124,19 @@
 
         <ImageButton
             android:id="@+id/btn_drone1"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_centerVertical="true"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_marginTop="60dp"
             android:layout_alignParentLeft="true"
-            android:layout_marginLeft="60dp"
+            android:layout_marginLeft="80dp"
+            android:background="@drawable/drone2"
             android:backgroundTint="@color/white"
             />
         <TextView
             android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:layout_below="@+id/btn_drone1"
-            android:layout_marginLeft="60dp"
+            android:layout_marginLeft="75dp"
             android:layout_alignParentLeft="true"
             android:gravity="center"
             android:text="드론 1"
@@ -148,11 +149,12 @@
 
         <ImageButton
             android:id="@+id/btn_drone2"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_centerVertical="true"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_marginTop="60dp"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="60dp"
+            android:layout_marginRight="80dp"
+            android:background="@drawable/drone2"
             android:backgroundTint="@color/white"
             />
 
@@ -160,7 +162,7 @@
             android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:layout_below="@+id/btn_drone2"
-            android:layout_marginRight="60dp"
+            android:layout_marginRight="75dp"
             android:layout_alignParentRight="true"
             android:gravity="center"
             android:text="드론 2"
@@ -262,8 +264,8 @@
             android:background="@drawable/circle" />
 
         <ImageView
-            android:layout_width="78dp"
-            android:layout_height="78dp"
+            android:layout_width="65dp"
+            android:layout_height="65dp"
             android:layout_centerInParent="true"
             android:layout_centerHorizontal="true"
             android:background="@drawable/ic_drone"

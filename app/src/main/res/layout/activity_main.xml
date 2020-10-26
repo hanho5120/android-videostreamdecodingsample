@@ -132,6 +132,17 @@
             android:background="@drawable/drone2"
             android:backgroundTint="@color/white"
             />
+        <!--테두리-->
+        <ImageView
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_marginTop="60dp"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="80dp"
+            android:background="@drawable/roundbtn"
+
+            />
+
         <TextView
             android:layout_width="80dp"
             android:layout_height="wrap_content"
@@ -158,6 +169,17 @@
             android:backgroundTint="@color/white"
             />
 
+
+        <!--테두리-->
+        <ImageView
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_marginTop="60dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="80dp"
+            android:background="@drawable/roundbtn"
+
+            />
         <TextView
             android:layout_width="80dp"
             android:layout_height="wrap_content"

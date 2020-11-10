@@ -26,6 +26,7 @@ public class Userdata{
     //public String _profile_photo;
 
     public String _server_url="https://101.55.28.64:444";
+    //public String _operatingserver_url="https://rms.gg.go.kr";
     public int _selected_drone;
 
     private Userdata(){}

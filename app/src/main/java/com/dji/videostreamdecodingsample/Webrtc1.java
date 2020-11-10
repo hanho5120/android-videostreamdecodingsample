@@ -1644,7 +1644,7 @@ public class Webrtc1 extends Activity implements DJICodecManager.YuvDataCallback
                 videoViewWidth = videostreamPreviewSf.getWidth();
                 videoViewHeight = videostreamPreviewSf.getHeight();
 
-                Toast.makeText(getApplicationContext(), "가로 : "+videoViewWidth +", 세로 : "+videoViewHeight, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(), "가로 : "+videoViewWidth +", 세로 : "+videoViewHeight, Toast.LENGTH_SHORT).show();
 
                 Log.d(TAG, "real onSurfaceTextureAvailable3: width " + videoViewWidth + " height " + videoViewHeight);
                 switch (demoType) {

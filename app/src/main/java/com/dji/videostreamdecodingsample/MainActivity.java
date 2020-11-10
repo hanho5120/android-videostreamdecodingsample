@@ -82,7 +82,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
     TextView edit_idText;
     TextView edit_pwText;
     View view_userInfo;
-    View view_droneimg;
+    //View view_droneimg;
     View view_background;
     View view_inform;
     boolean checkUsbConnection;
@@ -264,7 +264,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
         //로그인정보
 
         view_userInfo = (View) findViewById(R.id.view_userInfo);
-        view_droneimg = (View) findViewById(R.id.view_droneimg);
+        //view_droneimg = (View) findViewById(R.id.view_droneimg);
         view_background = (View) findViewById(R.id.view_background);
         view_inform = (View) findViewById(R.id.view_inform);
         view_background.setOnClickListener(new View.OnClickListener(){
@@ -494,12 +494,12 @@ public class MainActivity extends Activity implements View.OnClickListener, Popu
                         //startActivity(intent);
                         //btn_map_widget.setVisibility(View.VISIBLE);
                         view_userInfo.setVisibility(View.VISIBLE);
-                        view_droneimg.setVisibility(View.VISIBLE);
+                        //view_droneimg.setVisibility(View.VISIBLE);
                         view_inform.setVisibility(View.INVISIBLE);
                     }
                     else{
                         view_userInfo.setVisibility(View.INVISIBLE);
-                        view_droneimg.setVisibility(View.INVISIBLE);
+                        //view_droneimg.setVisibility(View.INVISIBLE);
                         view_inform.setVisibility(View.VISIBLE);
                     }
                     break;
